@@ -6,7 +6,7 @@
 #include "p1.h"
 
 int main() {
-    std::fstream input{"day2.txt"};
+    std::ifstream input{"day2.txt"};
     char x, y;
     int score = 0;
     int scoretwo = 0;
