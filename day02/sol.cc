@@ -20,6 +20,6 @@ int main() {
         score += enemy->accept(*one);
         scoretwo += enemy->accept(*two);
     }
-    std::cout << score << std::endl;
-    std::cout << scoretwo << std::endl;
+    std::cout << "Part A solution: " << score << std::endl;
+    std::cout << "Part B solution: " << scoretwo << std::endl;
 }
