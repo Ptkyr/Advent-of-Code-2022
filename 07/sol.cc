@@ -95,6 +95,7 @@ int main() {
     std::ifstream input{"day7.txt"};
     std::unique_ptr<Entry> filesystem = std::make_unique<Dir>("/");
     filesystem->read(input);
+
     std::vector<const Entry*> one;
     filesystem->p1(one);
     int part_one_ans = 0;
