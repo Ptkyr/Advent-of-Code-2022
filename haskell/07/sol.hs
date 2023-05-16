@@ -1,24 +1,41 @@
-import Data.List
-
 main :: IO ()
 main = do
     input <- readFile "input.txt"
     print . words $ input
 
--- Basically splitOn newline
-parse :: String -> [String]
-parse s = case break (== '\n') s of
-    (a, _ : b) -> a : parse b
-    (a, _)     -> [a]
+data File = File
+    { name :: String
+    , size :: Int
+    , subs :: [File]
+    , prnt :: Maybe File
+    } deriving (Show)
 
--- Convert to each elf's calorie count
-cals :: Int -> [String] -> [Int]
-cals _ []        = []
-cals a ("" : xs) = a : cals 0 xs
-cals a (x : xs)  = cals (a + read x) xs
+buildFile :: File -> [String] -> File
+buildFile f ("$" : "cd" : ".." : s) = case prnt f of
+    Just p  -> buildFile (p { subs = replaceFile (subs p) f }) s
+    Nothing -> f
+buildFile f ("$" : "cd" : d : s)    = buildFile (findFile (subs f) d) s
+buildFile f ("$" : "ls" : s)        = buildFile f s
+buildFile f ("dir" : d : s)         = buildFile (addFile f (File d 0 [] (Just f))) s
+buildFile f (x : d : s)             = buildFile (addFile f (File d (read x) [] (Just f))) s
+buildFile f _                       = f
 
-partOne :: [Int] -> Int
-partOne = maximum
+addFile :: File -> File -> File
+addFile p f = p { subs = f : (subs p) }
 
-partTwo :: [Int] -> Int
-partTwo = sum . take 3 . sortBy (flip compare)
+replaceFile :: [File] -> File -> [File]
+replaceFile [] _ = []
+replaceFile (s : ss) f
+    | name s == name f = f : ss
+    | otherwise        = s : replaceFile ss f
+
+findFile :: [File] -> String -> File
+findFile (f : []) _ = f
+findFile (f : fs) s
+    | name f == s = f
+    | otherwise   = findFile fs s
+
+setFileSize :: File -> File
+setFileSize f = case subs f of
+    []        -> f
+    otherwise -> f { size = sum . map size . map setFileSize $ (subs f) }
