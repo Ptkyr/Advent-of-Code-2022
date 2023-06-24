@@ -24,9 +24,6 @@ partOne = sum . map rucks
             | otherwise = common as bs
 
 partTwo :: [String] -> Int
-partTwo []               = 0
-partTwo (_ : [])         = 0 -- Just for complete
-partTwo (_ : _ : [])     = 0 --  pattern matching
 partTwo (a : b : c : ss) = sack3 a b c + partTwo ss
     where
     sack3 :: String -> String -> String -> Int
@@ -34,3 +31,4 @@ partTwo (a : b : c : ss) = sack3 a b c + partTwo ss
     sack3 (x : xs) y z
         | elem x y && elem x z = priority x
         | otherwise            = sack3 xs y z
+partTwo _                = 0
