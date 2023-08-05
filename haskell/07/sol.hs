@@ -21,11 +21,11 @@ rootFile = File 0 "/" [] Nothing
 mkFS :: File -> [String] -> File
 mkFS f cmd = case cmd of
     "$" : "cd" : ".." : xs -> unroll p xs
-    "$" : "cd" : d : xs    -> mkFS (File 0 d [] $ Just f) xs
+    "$" : "cd" : _ : xs    -> mkFS (File 0 "" [] $ Just f) xs
     "$" : "ls" : xs        -> mkFS f xs
     "dir" : _ : xs         -> mkFS f xs
-    x : fnm : xs           -> mkFS f {ch = new : ch f} xs
-        where new = File (read x) fnm [] Nothing
+    x : _ : xs             -> mkFS f {ch = new : ch f} xs
+        where new = File (read x) "" [] Nothing
     _ | nm f /= "/"        -> unroll p [] -- Done parsing, make / root
       | otherwise          -> szSet f     -- Return root 
     where 
@@ -41,26 +41,17 @@ mkFS f cmd = case cmd of
                 szCh :: File -> Int
                 szCh = sum . map sz . ch
 
-p1Small :: Int
-p1Small = 100000
-
 partOne :: File -> Int
 partOne f = isSmall f + (sum . map partOne . ch $ f)
     where 
         isSmall :: File -> Int
         isSmall (File _ _ [] _) = 0 -- Only count directories
         isSmall (File x _ _ _)
-            | x <= p1Small = x
-            | otherwise    = 0
+            | x <= 100000 = x
+            | otherwise   = 0
         
-p2TotSp :: Int
-p2TotSp = 70000000
-
-p2RqSp :: Int
-p2RqSp = 30000000
-
 p2min :: File -> Int
-p2min rt = p2RqSp - p2TotSp + sz rt
+p2min rt = 30000000 - 70000000 + sz rt
 
 partTwo :: File -> Int
 partTwo rt = p2FixT (ftmin rt) rt
