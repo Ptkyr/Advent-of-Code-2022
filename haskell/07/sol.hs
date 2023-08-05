@@ -4,7 +4,7 @@ main :: IO ()
 main = do
     input <- readFile "input.txt"
     let ignoreRoot = drop 3 . words $ input
-    let system = szSet . mkFS rootFile $ ignoreRoot
+    let system = mkFS rootFile $ ignoreRoot
     print . partOne $ system
     print . partTwo $ system
 
@@ -18,39 +18,40 @@ data File = File
 rootFile :: File
 rootFile = File 0 "/" [] Nothing
 
-szSet :: File -> File
-szSet f = f {sz = szCh f, pn = Nothing}
-    where
-        szCh :: File -> Int
-        szCh = sum . map sz . ch
-
 mkFS :: File -> [String] -> File
 mkFS f cmd = case cmd of
     "$" : "cd" : ".." : xs -> unroll p xs
-    "$" : "cd" : d : xs    -> mkFS (File 0 d [] (Just f)) xs
+    "$" : "cd" : d : xs    -> mkFS (File 0 d [] $ Just f) xs
     "$" : "ls" : xs        -> mkFS f xs
     "dir" : _ : xs         -> mkFS f xs
-    x : fnm : xs           -> mkFS (f {ch = new : ch f}) xs
+    x : fnm : xs           -> mkFS f {ch = new : ch f} xs
         where new = File (read x) fnm [] Nothing
     _ | nm f /= "/"        -> unroll p [] -- Done parsing, make / root
-      | otherwise          -> f
+      | otherwise          -> szSet f     -- Return root 
     where 
         p = pn f
+        -- unroll -> after making a dir, insert into parent
         unroll :: Maybe File -> [String] -> File
-        unroll (Just ex) cs = mkFS (ex {ch = (szSet f) : ch ex}) cs
-        unroll Nothing   _  = rootFile -- Error, unreachable
+        unroll (Just d) cs = mkFS d {ch = (szSet f) : ch d} cs
+        unroll Nothing  _  = rootFile -- Error, unreachable
+        -- szSet -> after making a dir, set its size
+        szSet :: File -> File
+        szSet d = d {sz = szCh d, pn = Nothing}
+            where
+                szCh :: File -> Int
+                szCh = sum . map sz . ch
 
 p1Small :: Int
 p1Small = 100000
 
 partOne :: File -> Int
-partOne f = (isSmall f) + (sum . map partOne . ch $ f)
+partOne f = isSmall f + (sum . map partOne . ch $ f)
     where 
         isSmall :: File -> Int
         isSmall (File _ _ [] _) = 0 -- Only count directories
         isSmall (File x _ _ _)
-            | x <= p1Small  = x
-            | otherwise = 0
+            | x <= p1Small = x
+            | otherwise    = 0
         
 p2TotSp :: Int
 p2TotSp = 70000000
@@ -59,7 +60,7 @@ p2RqSp :: Int
 p2RqSp = 30000000
 
 p2min :: File -> Int
-p2min rt = p2RqSp - (p2TotSp - (sz rt))
+p2min rt = p2RqSp - p2TotSp + sz rt
 
 partTwo :: File -> Int
 partTwo rt = p2FixT (ftmin rt) rt
