@@ -1,36 +1,76 @@
+import Data.List (sort, foldl')
+
 main :: IO ()
 main = do
     input <- readFile "input.txt"
-    let tokens = drop 3 . words $ input
-    let filesystem = (buildFile (File "/" 0 0 []) tokens)
-    --print . partOne $ filesystem
-    print filesystem
+    let ignoreRoot = drop 3 . words $ input
+    let system = szSet . mkFS rootFile $ ignoreRoot
+    print . partOne $ system
+    print . partTwo $ system
 
 data File = File
-    { name :: String
-    , size :: Int
-    , scnt :: Int
-    , subs :: [File]
-    } deriving (Show)
+    { sz :: Int
+    , nm :: String
+    , ch :: [File]
+    , pn :: Maybe File
+    }
 
--- Need to return modified input stream
-buildFile :: File -> [String] -> (File, [String])
-buildFile f ("$" : "cd" : ".." : s) = f
-buildFile f ("$" : "cd" : d : s)    = f { scnt = scnt f + 1, subs = (buildFile (File d 0 0 []) s) : (subs f)}
-buildFile f ("$" : "ls" : s)        = buildFile f s
-buildFile f ("dir" : d : s)         = buildFile f s
-buildFile f (x : d : s)             = buildFile (f { scnt = scnt f + 1, subs = (File d (read x) 0 []) : (subs f)}) s
-buildFile f _                       = f
+rootFile :: File
+rootFile = File 0 "/" [] Nothing
 
-setFileSize :: File -> File
-setFileSize f = case subs f of
-    []        -> f
-    otherwise -> f { size = sum . map size . map setFileSize $ (subs f) }
+szSet :: File -> File
+szSet f = f {sz = szCh f, pn = Nothing}
+    where
+        szCh :: File -> Int
+        szCh = sum . map sz . ch
+
+mkFS :: File -> [String] -> File
+mkFS f cmd = case cmd of
+    "$" : "cd" : ".." : xs -> unroll p xs
+    "$" : "cd" : d : xs    -> mkFS (File 0 d [] (Just f)) xs
+    "$" : "ls" : xs        -> mkFS f xs
+    "dir" : _ : xs         -> mkFS f xs
+    x : fnm : xs           -> mkFS (f {ch = new : ch f}) xs
+        where new = File (read x) fnm [] Nothing
+    _ | nm f /= "/"        -> unroll p [] -- Done parsing, make / root
+      | otherwise          -> f
+    where 
+        p = pn f
+        unroll :: Maybe File -> [String] -> File
+        unroll (Just ex) cs = mkFS (ex {ch = (szSet f) : ch ex}) cs
+        unroll Nothing   _  = rootFile -- Error, unreachable
+
+p1Small :: Int
+p1Small = 100000
 
 partOne :: File -> Int
-partOne f = isSmall f + (sum . map partOne $ (subs f))
+partOne f = (isSmall f) + (sum . map partOne . ch $ f)
+    where 
+        isSmall :: File -> Int
+        isSmall (File _ _ [] _) = 0 -- Only count directories
+        isSmall (File x _ _ _)
+            | x <= p1Small  = x
+            | otherwise = 0
+        
+p2TotSp :: Int
+p2TotSp = 70000000
+
+p2RqSp :: Int
+p2RqSp = 30000000
+
+p2min :: File -> Int
+p2min rt = p2RqSp - (p2TotSp - (sz rt))
+
+partTwo :: File -> Int
+partTwo rt = p2FixT (ftmin rt) rt
     where
-    isSmall :: File -> Int
-    isSmall f
-        | size f <= 2000000 = 1
-        | otherwise        = 0
+        p2FixT :: (Int -> Int -> Int) -> File -> Int
+        -- Order moot, but foldl' is faster
+        p2FixT m f = foldl' m (sz f) $ map (p2FixT m) . ch $ f
+        ftmin :: File -> Int -> Int -> Int
+        ftmin rtf = gtmin $ p2min rtf
+        gtmin :: Int -> Int -> Int -> Int
+        gtmin t x y 
+            | potentMin == [] = 0
+            | otherwise = head potentMin
+            where potentMin = sort . filter (> t) $ [x, y]
