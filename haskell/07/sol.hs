@@ -30,7 +30,7 @@ mkFS f cmd = case cmd of
       | otherwise          -> f           -- Return root 
     where 
         p = pn f
-        -- unroll -> after making a dir, insert into parent
+        -- unroll; after making a dir, insert into parent
         unroll :: Maybe File -> [String] -> File
         unroll (Just d) cs = mkFS d {ch = f : ch d, sz = sz d + sz f} cs
         unroll Nothing  _  = rootFile -- Error, unreachable
@@ -39,9 +39,8 @@ partOne :: File -> Int
 partOne f = isSmall f + (sum . map partOne . ch $ f)
     where 
         isSmall :: File -> Int
-        isSmall (File x _ _ _)
-            | x <= 100000 = x
-            | otherwise   = 0
+        isSmall t = if x <= 100000 then x else 0
+            where x = sz t
         
 p2min :: File -> Int
 p2min rt = 30000000 - 70000000 + sz rt
@@ -52,10 +51,10 @@ partTwo rt = p2FixT (ftmin rt) rt
         p2FixT :: (Int -> Int -> Int) -> File -> Int
         -- Order moot, but foldl' is faster
         p2FixT m f = foldl' m (sz f) $ map (p2FixT m) . ch $ f
-        -- ftmin -> wrapper
+        -- ftmin; wrapper
         ftmin :: File -> Int -> Int -> Int
         ftmin = gtmin . p2min
-        -- gtmin -> take min of numbers above t, 0 iff both below
+        -- gtmin; take min of x y above t, 0 iff both below
         gtmin :: Int -> Int -> Int -> Int
         gtmin t x y = case sort . filter (> t) $ [x, y] of
             m : _ -> m
