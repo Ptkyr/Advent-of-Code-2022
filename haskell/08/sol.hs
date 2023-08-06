@@ -7,7 +7,6 @@ main :: IO ()
 main = do
     input <- readFile "input.txt"
     let forest = parseToArr . words $ input
-    --print . visU $ forest
     print . partOne $ forest
     print . partTwo $ forest
 
@@ -23,36 +22,33 @@ zipWithArr f a1 a2 = array bnds
         rngs = range bnds
         lf = liftA2 f (a1 !) (a2 !)
 
-origin :: (Int, Int)
-origin = (1, 1)
-
 parseToArr :: [String] -> Arr2DInt
 parseToArr s = array bnds 
              $ zip rngs
              $ concat . map (map digitToInt) $ s
     where
-        bnds = (origin, (x, y))
+        bnds = ((1, 1), (x, y))
         rngs = range bnds
         x = length s
         y = length . head $ s
 
 partOne :: Arr2DInt -> Int
-partOne a = sum . foldr (zipWithArr (ior)) top $ [lef, bot, rht]
+partOne a = sum . foldr (zipWithArr (ior)) u $ [l, d, r]
     where
         ior :: Int -> Int -> Int
         ior x y = clamp (0, 1) $ x + y
-        top = visU a
-        lef = visL a
-        bot = visD a
-        rht = visR a
+        u = visU a
+        l = visL a
+        d = visD a
+        r = visR a
 
 partTwo :: Arr2DInt -> Int
-partTwo a = maximum . foldr (zipWithArr (*)) top $ [lef, bot, rht]
+partTwo a = maximum . foldr (zipWithArr (*)) u $ [l, d, r]
     where
-        top = viewU a
-        lef = viewL a
-        bot = viewD a
-        rht = viewR a
+        u = viewU a
+        l = viewL a
+        d = viewD a
+        r = viewR a
 
 visDir :: (Int -> Int) -> (Int -> Int) 
          -> Arr2DInt -> Arr2DInt
