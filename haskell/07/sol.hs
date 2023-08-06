@@ -46,14 +46,11 @@ p2min :: File -> Int
 p2min rt = 30000000 - 70000000 + sz rt
 
 partTwo :: File -> Int
-partTwo rt = p2FixT (ftmin rt) rt
+partTwo rt = p2FixT (gtmin . p2min $ rt) rt
     where
         p2FixT :: (Int -> Int -> Int) -> File -> Int
         -- Order moot, but foldl' is faster
         p2FixT m f = foldl' m (sz f) $ map (p2FixT m) . ch $ f
-        -- ftmin; wrapper
-        ftmin :: File -> Int -> Int -> Int
-        ftmin = gtmin . p2min
         -- gtmin; take min of x y above t, 0 iff both below
         gtmin :: Int -> Int -> Int -> Int
         gtmin t x y = case sort . filter (> t) $ [x, y] of
