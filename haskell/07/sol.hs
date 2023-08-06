@@ -1,4 +1,5 @@
 import Data.List (sort, foldl')
+import Text.Read (readMaybe)
 
 main :: IO ()
 main = do
@@ -22,10 +23,10 @@ mkFS :: File -> [String] -> File
 mkFS f cmd = case cmd of
     "$" : "cd" : ".." : xs -> unroll p xs
     "$" : "cd" : _ : xs    -> mkFS (File 0 "" [] $ Just f) xs
-    "$" : "ls" : xs        -> mkFS f xs
-    "dir" : _ : xs         -> mkFS f xs
-    x : _ : xs             -> mkFS f {ch = new : ch f} xs
-        where new = File (read x) "" [] Nothing
+    x : _ : xs -> case readMaybe x of
+        Nothing            -> mkFS f xs
+        Just num           -> mkFS f {ch = new : ch f} xs
+            where new = File num "" [] Nothing
     _ | nm f /= "/"        -> unroll p [] -- Done parsing, make / root
       | otherwise          -> szSet f     -- Return root 
     where 
@@ -59,10 +60,11 @@ partTwo rt = p2FixT (ftmin rt) rt
         p2FixT :: (Int -> Int -> Int) -> File -> Int
         -- Order moot, but foldl' is faster
         p2FixT m f = foldl' m (sz f) $ map (p2FixT m) . ch $ f
+        -- ftmin -> wrapper
         ftmin :: File -> Int -> Int -> Int
-        ftmin rtf = gtmin $ p2min rtf
+        ftmin = gtmin . p2min
+        -- gtmin -> take min of numbers above t, 0 iff both below
         gtmin :: Int -> Int -> Int -> Int
-        gtmin t x y 
-            | potentMin == [] = 0
-            | otherwise = head potentMin
-            where potentMin = sort . filter (> t) $ [x, y]
+        gtmin t x y = case sort . filter (> t) $ [x, y] of
+            m : _ -> m
+            []    -> 0
