@@ -24,29 +24,21 @@ mkFS f cmd = case cmd of
     "$" : "cd" : ".." : xs -> unroll p xs
     "$" : "cd" : _ : xs    -> mkFS (File 0 "" [] $ Just f) xs
     x : _ : xs -> case readMaybe x of
+        Just num           -> mkFS f {sz = num + sz f} xs
         Nothing            -> mkFS f xs
-        Just num           -> mkFS f {ch = new : ch f} xs
-            where new = File num "" [] Nothing
     _ | nm f /= "/"        -> unroll p [] -- Done parsing, make / root
-      | otherwise          -> szSet f     -- Return root 
+      | otherwise          -> f           -- Return root 
     where 
         p = pn f
         -- unroll -> after making a dir, insert into parent
         unroll :: Maybe File -> [String] -> File
-        unroll (Just d) cs = mkFS d {ch = (szSet f) : ch d} cs
+        unroll (Just d) cs = mkFS d {ch = f : ch d, sz = sz d + sz f} cs
         unroll Nothing  _  = rootFile -- Error, unreachable
-        -- szSet -> after making a dir, set its size
-        szSet :: File -> File
-        szSet d = d {sz = szCh d, pn = Nothing}
-            where
-                szCh :: File -> Int
-                szCh = sum . map sz . ch
 
 partOne :: File -> Int
 partOne f = isSmall f + (sum . map partOne . ch $ f)
     where 
         isSmall :: File -> Int
-        isSmall (File _ _ [] _) = 0 -- Only count directories
         isSmall (File x _ _ _)
             | x <= 100000 = x
             | otherwise   = 0
