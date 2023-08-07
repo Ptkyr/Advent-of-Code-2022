@@ -56,11 +56,9 @@ doMove (Move d n) seen (s : nake) = doMove (Move d $ n - 1) newSeen newSnake
 doMove _ _ []                     = error "Snake mutilated"
 
 slither :: [Coord] -> [Coord]
-slither (hd : tl : r)
-        | tl == newtl = hd : tl : r -- No propagation when motionless
-        | otherwise   = hd : slither (newtl : r)
+slither (hd : tl : r) = hd : slither (newtl : r)
     where newtl = follow tl hd
-slither ftl           = ftl
+slither end           = end
 
 follow :: Coord -> Coord -> Coord
 follow (x, y) (hx, hy)
