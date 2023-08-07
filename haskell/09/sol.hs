@@ -8,18 +8,18 @@ main = do
     print . partOne $ moves
     print . partTwo $ moves
 
-data Dir = U | D | L | R
-type Move = (Dir, Int)
 type Coord = (Int, Int)
+type Stepper = Coord -> Coord
+type Move = (Stepper, Int)
 
 parse :: [String] -> [Move]
 parse (d : c : xs) =  (std d, read c) : parse xs
     where
-        std :: String -> Dir
-        std "U" = U
-        std "D" = D
-        std "L" = L
-        std "R" = R
+        std :: String -> Stepper
+        std "U" = (\(x, y) -> (x, y + 1))
+        std "D" = (\(x, y) -> (x, y - 1))
+        std "L" = (\(x, y) -> (x - 1, y))
+        std "R" = (\(x, y) -> (x + 1, y))
         std _   = error "Unreachable"
 parse _            = []
 
@@ -43,10 +43,10 @@ execute seen snake (m : ms) = execute newSeen newSnake ms
 
 doMove :: Move -> [Coord] -> [Coord] -> ([Coord], [Coord])
 doMove (_, 0) seen snake      = (seen, snake)
-doMove (d, n) seen (s : nake) = doMove (d, n - 1) newSeen newSnake
+doMove (f, n) seen (s : nake) = doMove (f, n - 1) newSeen newSnake
     where
         newSeen = last newSnake : seen
-        newSnake = slither $ (step d s) : nake
+        newSnake = slither $ (f s) : nake
 doMove _ _ []                     = error "Snake mutilated"
 
 slither :: [Coord] -> [Coord]
@@ -62,9 +62,3 @@ follow (x, y) (hx, hy)
         (dx, dy) = (hx - x, hy - y)
         stp :: Int -> Int
         stp = clamp (-1, 1)
-
-step :: Dir -> Coord -> Coord
-step U (x, y) = (x, y + 1)
-step D (x, y) = (x, y - 1)
-step L (x, y) = (x - 1, y)
-step R (x, y) = (x + 1, y)
