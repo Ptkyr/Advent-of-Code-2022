@@ -13,14 +13,14 @@ type Stepper = Coord -> Coord
 type Move = (Stepper, Int)
 
 parse :: [String] -> [Move]
-parse (d : c : xs) =  (std d, read c) : parse xs
+parse (d : c : xs) =  (toStepper d, read c) : parse xs
     where
-        std :: String -> Stepper
-        std "U" = (\(x, y) -> (x, y + 1))
-        std "D" = (\(x, y) -> (x, y - 1))
-        std "L" = (\(x, y) -> (x - 1, y))
-        std "R" = (\(x, y) -> (x + 1, y))
-        std _   = error "Unreachable"
+        toStepper :: String -> Stepper
+        toStepper "U" = (\(x, y) -> (x, y + 1))
+        toStepper "D" = (\(x, y) -> (x, y - 1))
+        toStepper "L" = (\(x, y) -> (x - 1, y))
+        toStepper "R" = (\(x, y) -> (x + 1, y))
+        toStepper _   = error "Unreachable"
 parse _            = []
 
 partOne :: [Move] -> Int
