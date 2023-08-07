@@ -9,17 +9,11 @@ main = do
     print . partTwo $ moves
 
 data Dir = U | D | L | R
-    deriving (Show)
-
-data Move = Move
-    { dir :: Dir
-    , cnt :: Int
-    } deriving (Show)
-
+type Move = (Dir, Int)
 type Coord = (Int, Int)
 
 parse :: [String] -> [Move]
-parse (d : c : xs) = Move (std d) (read c) : parse xs
+parse (d : c : xs) =  (std d, read c) : parse xs
     where
         std :: String -> Dir
         std "U" = U
@@ -48,8 +42,8 @@ execute seen snake (m : ms) = execute newSeen newSnake ms
     where (newSeen, newSnake) = doMove m seen snake
 
 doMove :: Move -> [Coord] -> [Coord] -> ([Coord], [Coord])
-doMove (Move _ 0) seen snake      = (seen, snake)
-doMove (Move d n) seen (s : nake) = doMove (Move d $ n - 1) newSeen newSnake
+doMove (_, 0) seen snake      = (seen, snake)
+doMove (d, n) seen (s : nake) = doMove (d, n - 1) newSeen newSnake
     where
         newSeen = last newSnake : seen
         newSnake = slither $ (step d s) : nake
