@@ -12,7 +12,7 @@ main = do
 
 type Arr2D a = Array (Int, Int) a
 
-zipWithArr :: (a -> a -> b) -> Arr2D a -> Arr2D a -> Arr2D b
+zipWithArr :: (a -> b -> c) -> Arr2D a -> Arr2D b -> Arr2D c
 zipWithArr f a1 a2 = array bnds 
                    $ zip rang
                    $ fmap lf rang
