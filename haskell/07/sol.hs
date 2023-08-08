@@ -33,8 +33,10 @@ mkFS f cmd = case cmd of
         p = pn f
         -- unroll; after making a dir, insert into parent
         unroll :: Maybe Dir -> [String] -> Dir
-        unroll (Just d) cs = mkFS d {ch = f : ch d, sz = sz d + sz f} cs
         unroll Nothing  _  = error "Unreachable"
+        unroll (Just d) cs = mkFS newdir cs
+            where newf = f {pn = Nothing}
+                  newdir = d {ch = newf : ch d, sz = sz newf + sz d}
 
 partOne :: Dir -> Int
 partOne f = isSmall f + (sum . map partOne . ch $ f)
