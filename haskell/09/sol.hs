@@ -33,24 +33,24 @@ visited :: Int -> [Move] -> Int
 visited snakeLen = length
                  . group
                  . sort
-                 . execute [origin] (replicate snakeLen origin)
+                 . tailPositions [origin] (replicate snakeLen origin)
     where origin = (0, 0)
 
-execute :: [Coord] -> [Coord] -> [Move] -> [Coord]
-execute seen _ []           = seen
-execute seen snake (m : ms) = execute newSeen newSnake ms
-    where (newSeen, newSnake) = doMove m seen snake
+tailPositions :: [Coord] -> [Coord] -> [Move] -> [Coord]
+tailPositions seen _ []           = seen
+tailPositions seen snake (m : ms) = tailPositions newSeen newSnake ms
+    where (newSeen, newSnake) = execute m seen snake
 
-doMove :: Move -> [Coord] -> [Coord] -> ([Coord], [Coord])
-doMove (_, 0) seen snake      = (seen, snake)
-doMove (f, n) seen (s : nake) = doMove (f, n - 1) newSeen newSnake
+execute :: Move -> [Coord] -> [Coord] -> ([Coord], [Coord])
+execute (_, 0) seen snake      = (seen, snake)
+execute (f, n) seen (s : nake) = execute (f, n - 1) newSeen newSnake
     where
         newSeen = last newSnake : seen
         newSnake = slither $ (f s) : nake
-doMove _ _ []                     = error "Snake mutilated"
+execute _ _ []                     = error "Snake mutilated"
 
 slither :: [Coord] -> [Coord]
-slither (hd : tl : r) = hd : slither (follow tl hd: r)
+slither (hd : tl : r) = hd : slither (follow tl hd : r)
 slither end           = end
 
 follow :: Coord -> Coord -> Coord
