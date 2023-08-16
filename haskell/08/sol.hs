@@ -57,8 +57,7 @@ valueAt edge halt recur fx fy forest
     | i <- [x..x']
     , j <- [y..y']]
     where
-        bnds = bounds forest
-        ((x, y), (x', y')) = bnds
+        bnds@((x, y), (x', y')) = bounds forest
         -- wave; go from (u, v) to the edge, stepping with fx/fy
         wave :: Int -> Int -> Int -> Int
         wave t u v
