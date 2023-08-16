@@ -14,8 +14,8 @@ partTwo = uniq 14 14
 
 uniq :: Int -> Int -> String -> Int
 uniq _ _ [] = 0
-uniq c x (s : ss)
+uniq c x str@(_ : ss)
     | u == c    = x 
     | otherwise = uniq c (x + 1) ss
         where 
-        u = length . group . sort . take c $ s : ss
+        u = length . group . sort . take c $ str
