@@ -1,11 +1,8 @@
-module Main where
-
 import Text.Megaparsec -- main module
 import Text.Megaparsec.Char -- common combinators for character streams
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Debug
 import Text.Read (readMaybe)
-import Control.Monad (void)
 import Data.Void
 import Data.Text (Text, pack)
 import Data.Char
