@@ -3,7 +3,7 @@ import Data.Ord (clamp)
 
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "09/input.txt"
     let moves = parse . words $ input
     print . partOne $ moves
     print . partTwo $ moves

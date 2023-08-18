@@ -2,7 +2,7 @@ import Data.List
 
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "01/input.txt"
     let elves = cals 0 . parse $ input
     print . partOne $ elves
     print . partTwo $ elves

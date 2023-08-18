@@ -1,6 +1,6 @@
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "04/input.txt"
     let elves = parse $ input
     print . partOne $ elves
     print . partTwo $ elves

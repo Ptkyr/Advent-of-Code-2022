@@ -5,7 +5,7 @@ import Data.Ord (clamp)
 
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "08/input.txt"
     let forest = parseToArr . words $ input
     print . partOne $ forest
     print . partTwo $ forest

@@ -2,7 +2,7 @@ import Data.Char
 
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "05/input.txt"
     let config = takeWhile (/= '1') input
     let cmds = parseCmds . dropWhile (\x -> x /= 'm') $ input
     let initBoxes = parseConfig (replicate 9 []) . init . parse $ config

@@ -2,7 +2,7 @@ import Data.List
 
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "06/input.txt"
     print . partOne $ input
     print . partTwo $ input
 

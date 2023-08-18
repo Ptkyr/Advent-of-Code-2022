@@ -3,7 +3,7 @@ import Text.Read (readMaybe)
 
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "07/input.txt"
     let system = mkFS rootDir . drop 3 . words $ input
     print . partOne $ system
     print . partTwo $ system

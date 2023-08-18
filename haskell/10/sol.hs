@@ -1,6 +1,6 @@
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "10/input.txt"
     let asm = parse . words $ input
     print . partOne $ asm
     print . partTwo $ asm

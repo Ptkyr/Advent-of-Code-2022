@@ -1,6 +1,6 @@
 main :: IO ()
 main = do
-    input <- readFile "input.txt"
+    input <- readFile "02/input.txt"
     let rps = words $ input
     print . partOne $ rps
     print . partTwo $ rps
