@@ -13,7 +13,7 @@ import Data.List
 main :: IO ()
 main = do
     input <- readFile "11/input.txt"
-    let parsed = runParser aocParse "what" $ pack input
+    let parsed = parse aocParse "" $ pack input
     let Right monkeys = parsed
     print $ partOne monkeys
     print $ partTwo monkeys
@@ -47,7 +47,7 @@ doRound trunc a = foldl (doInspection trunc) a $ indices a
 
 doInspection :: (Int -> Int) -> ArrMonkey -> Int -> ArrMonkey
 doInspection trunc a i = case a!i of
-    (Monkey _ [] _ _)       -> a
+    (Monkey _ [] _ _)         -> a
     (Monkey act (x : xs) o t) -> doInspection trunc (a // [cur, new]) i
         where
         cur      = (i, Monkey (act + 1) xs o t)
@@ -65,43 +65,28 @@ lexeme = L.lexeme $ L.space space1 empty empty
 decimal :: Parser Int
 decimal = lexeme L.decimal
 
-parseIndex :: Parser ()
-parseIndex = do
-    void $ lexeme "Monkey" *> decimal *> lexeme ":"
-
 parseItems :: Parser [Int]
 parseItems = do
     lexeme "Starting items:"
-    lst <- many lstitem
-    end <- decimal
-    return $ lst ++ [end]
-    where
-        lstitem :: Parser Int
-        lstitem = try $ do
-            i <- decimal 
-            lexeme "," -- no comma -> backtrack for last item
-            return i
+    decimal `sepBy` lexeme ","
 
 parseOper :: Parser (Int -> Int)
 parseOper = do
     lexeme "Operation: new = old"
-    op <- lexeme asciiChar
-    n <- lexeme $ some alphaNumChar
-    let x = readMaybe n
+    operator <- lexeme asciiChar
+    operand  <- lexeme $ some alphaNumChar
+    let x = readMaybe operand
     pure $ case x of
         Nothing  -> (\x -> x * x) -- "old", maybe hardcoded?
-        Just num -> if op == '+' 
+        Just num -> if operator == '+' 
                     then (+) num 
                     else (*) num
 
 parseTester :: Parser (Int -> Int)
 parseTester = do
-    lexeme "Test: divisible by"
-    modulus <- decimal
-    lexeme "If true: throw to monkey"
-    onTrue  <- decimal
-    lexeme "If false: throw to monkey"
-    onFalse <- decimal
+    modulus <- lexeme "Test: divisible by"        *> decimal
+    onTrue  <- lexeme "If true: throw to monkey"  *> decimal
+    onFalse <- lexeme "If false: throw to monkey" *> decimal
     pure $ makeTest modulus onTrue onFalse
     where 
         makeTest :: Int -> Int -> Int -> Int -> Int
@@ -111,11 +96,11 @@ parseTester = do
 
 oneMonkey :: Parser Monkey
 oneMonkey = do
-    parseIndex
+    lexeme "Monkey" *> decimal *> lexeme ":"
     Monkey 0 <$> parseItems <*> parseOper <*> parseTester
 
 aocParse :: Parser ArrMonkey
 aocParse = do
     mlst <- some oneMonkey <* eof
     let bndslst = (0, length mlst - 1)
-    return (array bndslst $ zip (range bndslst) $ mlst)
+    pure $ array bndslst $ zip (range bndslst) $ mlst
