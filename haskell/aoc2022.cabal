@@ -1,106 +1,72 @@
 cabal-version:      2.4
-name:               AdventOfCode2022
+name:               aoc2022
 version:            0.1.0.0
 
 author:             Ptkyr
 
-executable 01
-    main-is:         sol.hs
+common aoc
     build-depends:    base ^>=4.16.4.0
                       , megaparsec
                       , text
-    hs-source-dirs:   01
+                      , array
+                      , aoc2022
+    default-language:   Haskell2010
+    default-extensions: OverloadedStrings
+    hs-source-dirs: 01, 02, 03, 04, 05
+                  , 06, 07, 08, 09, 10
+                  , 11
+    ghc-options:       -Wall
+
+library
+    exposed-modules: Utils
+    build-depends:    base ^>=4.16.4.0
+                      , megaparsec
+                      , text
+                      , array
+    hs-source-dirs:   common
     default-language: Haskell2010
     default-extensions: OverloadedStrings
+
+executable 01
+    import: aoc
+    main-is: 01.hs
 
 executable 02
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   02
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 02.hs
 
 executable 03
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   03
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 03.hs
 
 executable 04
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   04
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 04.hs
 
 executable 05
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   05
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 05.hs
 
 executable 06
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   06
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 06.hs
 
 executable 07
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   07
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 07.hs
 
 executable 08
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-                      , array
-    hs-source-dirs:   08
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 08.hs
 
 executable 09
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   09
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 09.hs
 
 executable 10
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-    hs-source-dirs:   10
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 10.hs
 
 executable 11
-    main-is:         sol.hs
-    build-depends:    base ^>=4.16.4.0
-                      , megaparsec
-                      , text
-                      , array
-    hs-source-dirs:   11
-    default-language: Haskell2010
-    default-extensions: OverloadedStrings
+    import: aoc
+    main-is: 11.hs

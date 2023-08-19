@@ -1,14 +1,4 @@
-import Text.Megaparsec -- main module
-import Text.Megaparsec.Char -- common combinators for character streams
-import qualified Text.Megaparsec.Char.Lexer as L
-import Text.Megaparsec.Debug
-import Text.Read (readMaybe)
-import Control.Monad (void)
-import Data.Void
-import Data.Text (Text, pack)
-import Data.Char
-import Data.Array
-import Data.List
+import Utils
 
 main :: IO ()
 main = do
@@ -57,27 +47,17 @@ doInspection trunc am i = case am!i of
         new      = (targetIx, target {items = items target
                                             ++ [newWorry]})
 
-type Parser = Parsec Void Text
-
-lexeme :: Parser a -> Parser a
-lexeme = L.lexeme $ L.space space1 empty empty
-
-decimal :: Parser Int
-decimal = lexeme L.decimal
-
 parseItems :: Parser [Int]
 parseItems = do
-    lexeme "Starting items:"
-    decimal `sepBy` lexeme ","
+    lexeme "Starting items:" *> decimal `sepBy` lexeme ","
 
 parseOper :: Parser (Int -> Int)
 parseOper = do
-    lexeme "Operation: new = old"
-    operator <- lexeme asciiChar
+    operator <- lexeme "Operation: new = old" *> lexeme asciiChar
     operand  <- lexeme $ some alphaNumChar
-    let x = readMaybe operand
-    pure $ case x of
-        Nothing  -> (\x -> x * x) -- "old", maybe hardcoded?
+    let mx = readMaybe operand
+    pure $ case mx of
+        Nothing  -> (\x -> x * x) -- "old", maybe hardcoded and bad?
         Just num -> if operator == '+' 
                     then (+) num 
                     else (*) num
@@ -88,14 +68,14 @@ parseTester = do
              <*> (lexeme "If true: throw to monkey"  *> decimal)
              <*> (lexeme "If false: throw to monkey" *> decimal)
     where 
-        makeTest :: Int -> Int -> Int -> Int -> Int
-        makeTest m t f x
-            | x `rem` m == 0 = t
-            | otherwise      = f
+    makeTest :: Int -> Int -> Int -> Int -> Int
+    makeTest m t f x
+        | x `rem` m == 0 = t
+        | otherwise      = f
 
 oneMonkey :: Parser Monkey
 oneMonkey = do
-    lexeme "Monkey" *> decimal *> lexeme ":"
+    void $ lexeme "Monkey" *> decimal *> lexeme ":" 
     Monkey 0 <$> parseItems <*> parseOper <*> parseTester
 
 aocParse :: Parser ArrMonkey

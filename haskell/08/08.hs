@@ -1,6 +1,4 @@
-import Data.Array
-import Data.Char
-import Control.Applicative
+import Utils
 import Data.Ord (clamp)
 
 main :: IO ()
@@ -9,17 +7,6 @@ main = do
     let forest = parseToArr . words $ input
     print . partOne $ forest
     print . partTwo $ forest
-
-type Arr2D a = Array (Int, Int) a
-
-zipWithArr :: (a -> b -> c) -> Arr2D a -> Arr2D b -> Arr2D c
-zipWithArr f a1 a2 = array bnds 
-                   $ zip rang
-                   $ fmap lf rang
-    where
-        bnds = bounds a1
-        rang = range bnds
-        lf = liftA2 f (a1 !) (a2 !)
 
 parseToArr :: [String] -> Arr2D Int
 parseToArr s = array bnds 
