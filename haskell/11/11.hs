@@ -3,7 +3,7 @@ import Utils
 main :: IO ()
 main = do
     input <- readFile "11/input.txt"
-    let parsed = parse aocParse "" $ pack input
+    let parsed = runParser aocParse "" $ pack input
     let Right monkeys = parsed
     print $ partOne monkeys
     print $ partTwo monkeys
@@ -11,8 +11,8 @@ main = do
 data Monkey = Monkey
     { activity :: Int
     , items    :: [Int]
-    , oper     :: Int -> Int
-    , tester   :: Int -> Int
+    , _oper    :: Int -> Int
+    , _tester  :: Int -> Int
     }
 
 type ArrMonkey = Array Int Monkey
@@ -47,6 +47,7 @@ doInspection trunc am i = case am!i of
         new      = (targetIx, target {items = items target
                                             ++ [newWorry]})
 
+-- All parsing from here
 parseItems :: Parser [Int]
 parseItems = do
     lexeme "Starting items:" *> decimal `sepBy` lexeme ","

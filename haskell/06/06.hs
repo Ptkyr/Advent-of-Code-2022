@@ -1,4 +1,4 @@
-import Data.List
+import Utils
 
 main :: IO ()
 main = do

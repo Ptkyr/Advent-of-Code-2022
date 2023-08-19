@@ -1,4 +1,4 @@
-import Data.Char
+import Utils
 
 main :: IO ()
 main = do

@@ -3,17 +3,18 @@ module Utils
     , module Data.Array
     , module Data.Char
     , module Data.List
-    , module Text.Megaparsec -- main module
-    , module Text.Megaparsec.Char -- common combinators for character streams
+    , module Text.Megaparsec 
+    , module Text.Megaparsec.Char
     , module Text.Megaparsec.Debug
     , readMaybe
     , void
     , module Data.Void
     , Text
     , pack
+    , clamp
     ) where
 
-import Text.Megaparsec -- main module
+import Text.Megaparsec hiding (parse) -- main module
 import Text.Megaparsec.Char -- common combinators for character streams
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Debug
@@ -25,6 +26,7 @@ import Data.Char
 import Data.List
 import Data.Array
 import Control.Applicative
+import Data.Ord (clamp)
 
 type Parser = Parsec Void Text
 

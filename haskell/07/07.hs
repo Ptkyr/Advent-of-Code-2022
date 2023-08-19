@@ -1,5 +1,4 @@
-import Data.List (sort, foldl')
-import Text.Read (readMaybe)
+import Utils
 
 main :: IO ()
 main = do

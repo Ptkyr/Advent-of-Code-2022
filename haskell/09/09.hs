@@ -1,5 +1,4 @@
-import Data.List
-import Data.Ord (clamp)
+import Utils
 
 main :: IO ()
 main = do
