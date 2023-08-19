@@ -3,33 +3,61 @@ import Text.Megaparsec.Char -- common combinators for character streams
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Debug
 import Text.Read (readMaybe)
+import Control.Monad (void)
 import Data.Void
 import Data.Text (Text, pack)
 import Data.Char
+import Data.Array
+import Data.List
+import Data.Either (fromRight)
 
 main :: IO ()
 main = do
     input <- readFile "11/input.txt"
-    let monkey = runParser aocParse "what" $ pack input
-    print monkey
+    let parsed = runParser aocParse "what" $ pack input
+    let Right monkeys = parsed
+    print $ partOne monkeys
+
+type ArrMonkey = Array Int Monke
+
+partOne :: ArrMonkey -> Int
+partOne ma = product 
+           . take 2 
+           . sortBy (flip compare) 
+           . map ac 
+           . elems 
+           $ iterate doRound ma !! 20
+
+doRound :: ArrMonkey -> ArrMonkey
+doRound a = foldl monkeyDo a $ indices a
+
+monkeyDo :: ArrMonkey -> Int -> ArrMonkey
+monkeyDo a i = case a!i of
+    (Monke _ [] _ _)       -> a
+    (Monke c (x : xs) o t) -> monkeyDo (a // [mi, mo]) i
+        where
+        mi = (i, Monke (c + 1) xs o t)
+        nw = div3 $ o x
+        ni = t nw
+        mm = a!ni
+        mo = (ni, mm {is = is mm ++ [nw]})
+
+div3 :: Int -> Int
+div3 x = x `div` 3
 
 type Parser = Parsec Void Text
 
 data Monke = Monke
-    { ix :: Int
+    { ac :: Int
     , is :: [Int]
     , op :: Int -> Int
     , ts :: Int -> Int
-    , ac :: Int
     }
 
 instance Show Monke where
-    show (Monke x s _ _ c) = "\n"
-                           ++ show x 
+    show (Monke c s _ _) = show c
                            ++ ", "
                            ++ show s
-                           ++ ", "
-                           ++ show c
 
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme $ L.space space1 empty empty
@@ -37,12 +65,11 @@ lexeme = L.lexeme $ L.space space1 empty empty
 decimal :: Parser Int
 decimal = lexeme L.decimal
 
-index :: Parser Int
-index = do
+monkx :: Parser ()
+monkx = do
     lexeme "Monkey"
-    i <- decimal
-    lexeme ":"
-    return i
+    decimal
+    void $ lexeme ":"
 
 items :: Parser [Int]
 items = do
@@ -65,7 +92,8 @@ oper = do
     let x = readMaybe n
     return (case x of
         Nothing  -> (\x -> x * x)
-        Just num -> if op == '+' then (+) num else (*) num)
+        Just num -> if op == '+' then (+) num 
+                                 else (*) num)
 
 test :: Parser (Int -> Int)
 test = do
@@ -79,19 +107,20 @@ test = do
     where 
         makeTest :: Int -> Int -> Int -> Int -> Int
         makeTest m t f x
-            | x `div` m == 0 = t
+            | x `rem` m == 0 = t
             | otherwise      = f
 
 oneMonkey :: Parser Monke
 oneMonkey = do
-    m <- index
+    monkx
     i <- items
     o <- oper
     t <- test
-    return (Monke m i o t 0)
+    return (Monke 0 i o t)
 
-aocParse :: Parser [Monke]
+aocParse :: Parser ArrMonkey
 aocParse = try $ do
     mlst <- some oneMonkey
     eof
-    return mlst
+    let bndslst = (0, length mlst - 1)
+    return (array bndslst $ zip (range bndslst) $ mlst)
