@@ -22,32 +22,33 @@ data Monkey = Monkey
     { activity :: Int
     , items    :: [Int]
     , oper     :: Int -> Int
-    , test     :: Int -> Int
+    , tester   :: Int -> Int
     }
 
 type ArrMonkey = Array Int Monkey
 
 partOne :: ArrMonkey -> Int
-partOne = solve 20 (flip div 3)
+partOne = monkeyBusiness 20 (flip div 3)
 
 partTwo :: ArrMonkey -> Int
-partTwo = solve 10000 (flip rem 9699690) -- ToDo: not hardcoded
+partTwo = monkeyBusiness 10000 (flip rem 9699690) -- To-do: not hardcoded
 
-solve :: Int -> (Int -> Int) -> ArrMonkey -> Int
-solve iters trunc ma = product 
-                     . take 2 
-                     . sortBy (flip compare) 
-                     . map activity
-                     . elems 
-                     $ iterate (doRound trunc) ma !! iters
+monkeyBusiness :: Int -> (Int -> Int) -> ArrMonkey -> Int
+monkeyBusiness iters trunc ma 
+    = product 
+    . take 2 
+    . sortBy (flip compare) 
+    . map activity
+    . elems 
+    $ iterate (doRound trunc) ma !! iters
 
 doRound :: (Int -> Int) -> ArrMonkey -> ArrMonkey
-doRound trunc a = foldl (monkeyDo trunc) a $ indices a
+doRound trunc a = foldl (doInspection trunc) a $ indices a
 
-monkeyDo :: (Int -> Int) -> ArrMonkey -> Int -> ArrMonkey
-monkeyDo trunc a i = case a!i of
+doInspection :: (Int -> Int) -> ArrMonkey -> Int -> ArrMonkey
+doInspection trunc a i = case a!i of
     (Monkey _ [] _ _)       -> a
-    (Monkey act (x : xs) o t) -> monkeyDo trunc (a // [cur, new]) i
+    (Monkey act (x : xs) o t) -> doInspection trunc (a // [cur, new]) i
         where
         cur      = (i, Monkey (act + 1) xs o t)
         newWorry = trunc $ o x
