@@ -34,26 +34,26 @@ partTwo :: ArrMonkey -> Int
 partTwo = monkeyBusiness 10000 (flip rem 9699690) -- To-do: not hardcoded
 
 monkeyBusiness :: Int -> (Int -> Int) -> ArrMonkey -> Int
-monkeyBusiness iters trunc ma 
+monkeyBusiness iters trunc am
     = product 
     . take 2 
     . sortBy (flip compare) 
     . map activity
     . elems 
-    $ iterate (doRound trunc) ma !! iters
+    $ iterate (doRound trunc) am !! iters
 
 doRound :: (Int -> Int) -> ArrMonkey -> ArrMonkey
-doRound trunc a = foldl' (doInspection trunc) a $ indices a
+doRound trunc am = foldl' (doInspection trunc) am $ indices am
 
 doInspection :: (Int -> Int) -> ArrMonkey -> Int -> ArrMonkey
-doInspection trunc a i = case a!i of
-    (Monkey _ [] _ _)         -> a
-    (Monkey act (x : xs) o t) -> doInspection trunc (a // [cur, new]) i
+doInspection trunc am i = case am!i of
+    (Monkey _ [] _ _)         -> am
+    (Monkey act (x : xs) o t) -> doInspection trunc (am // [cur, new]) i
         where
         cur      = (i, Monkey (act + 1) xs o t)
         newWorry = trunc $ o x
         targetIx = t newWorry
-        target   = a!targetIx
+        target   = am!targetIx
         new      = (targetIx, target {items = items target
                                             ++ [newWorry]})
 
@@ -84,10 +84,9 @@ parseOper = do
 
 parseTester :: Parser (Int -> Int)
 parseTester = do
-    modulus <- lexeme "Test: divisible by"        *> decimal
-    onTrue  <- lexeme "If true: throw to monkey"  *> decimal
-    onFalse <- lexeme "If false: throw to monkey" *> decimal
-    pure $ makeTest modulus onTrue onFalse
+    makeTest <$> (lexeme "Test: divisible by"        *> decimal)
+             <*> (lexeme "If true: throw to monkey"  *> decimal)
+             <*> (lexeme "If false: throw to monkey" *> decimal)
     where 
         makeTest :: Int -> Int -> Int -> Int -> Int
         makeTest m t f x
