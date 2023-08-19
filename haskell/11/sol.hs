@@ -9,7 +9,6 @@ import Data.Text (Text, pack)
 import Data.Char
 import Data.Array
 import Data.List
-import Data.Either (fromRight)
 
 main :: IO ()
 main = do
@@ -17,47 +16,47 @@ main = do
     let parsed = runParser aocParse "what" $ pack input
     let Right monkeys = parsed
     print $ partOne monkeys
+    print $ partTwo monkeys
 
-type ArrMonkey = Array Int Monke
-
-partOne :: ArrMonkey -> Int
-partOne ma = product 
-           . take 2 
-           . sortBy (flip compare) 
-           . map ac 
-           . elems 
-           $ iterate doRound ma !! 20
-
-doRound :: ArrMonkey -> ArrMonkey
-doRound a = foldl monkeyDo a $ indices a
-
-monkeyDo :: ArrMonkey -> Int -> ArrMonkey
-monkeyDo a i = case a!i of
-    (Monke _ [] _ _)       -> a
-    (Monke c (x : xs) o t) -> monkeyDo (a // [mi, mo]) i
-        where
-        mi = (i, Monke (c + 1) xs o t)
-        nw = div3 $ o x
-        ni = t nw
-        mm = a!ni
-        mo = (ni, mm {is = is mm ++ [nw]})
-
-div3 :: Int -> Int
-div3 x = x `div` 3
-
-type Parser = Parsec Void Text
-
-data Monke = Monke
-    { ac :: Int
-    , is :: [Int]
-    , op :: Int -> Int
-    , ts :: Int -> Int
+data Monkey = Monkey
+    { activity :: Int
+    , items    :: [Int]
+    , oper     :: Int -> Int
+    , test     :: Int -> Int
     }
 
-instance Show Monke where
-    show (Monke c s _ _) = show c
-                           ++ ", "
-                           ++ show s
+type ArrMonkey = Array Int Monkey
+
+partOne :: ArrMonkey -> Int
+partOne = solve 20 (flip div 3)
+
+partTwo :: ArrMonkey -> Int
+partTwo = solve 10000 (flip rem 9699690) -- ToDo: not hardcoded
+
+solve :: Int -> (Int -> Int) -> ArrMonkey -> Int
+solve iters trunc ma = product 
+                     . take 2 
+                     . sortBy (flip compare) 
+                     . map activity
+                     . elems 
+                     $ iterate (doRound trunc) ma !! iters
+
+doRound :: (Int -> Int) -> ArrMonkey -> ArrMonkey
+doRound trunc a = foldl (monkeyDo trunc) a $ indices a
+
+monkeyDo :: (Int -> Int) -> ArrMonkey -> Int -> ArrMonkey
+monkeyDo trunc a i = case a!i of
+    (Monkey _ [] _ _)       -> a
+    (Monkey act (x : xs) o t) -> monkeyDo trunc (a // [cur, new]) i
+        where
+        cur      = (i, Monkey (act + 1) xs o t)
+        newWorry = trunc $ o x
+        targetIx = t newWorry
+        target   = a!targetIx
+        new      = (targetIx, target {items = items target
+                                            ++ [newWorry]})
+
+type Parser = Parsec Void Text
 
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme $ L.space space1 empty empty
@@ -71,8 +70,8 @@ monkx = do
     decimal
     void $ lexeme ":"
 
-items :: Parser [Int]
-items = do
+parseItems :: Parser [Int]
+parseItems = do
     lexeme "Starting items:"
     lst <- many lstitem
     end <- decimal
@@ -84,8 +83,8 @@ items = do
             lexeme "," -- no comma -> backtrack for last item
             return i
 
-oper :: Parser (Int -> Int)
-oper = do
+parseOper :: Parser (Int -> Int)
+parseOper = do
     lexeme "Operation: new = old"
     op <- lexeme asciiChar
     n <- lexeme $ some alphaNumChar
@@ -95,8 +94,8 @@ oper = do
         Just num -> if op == '+' then (+) num 
                                  else (*) num)
 
-test :: Parser (Int -> Int)
-test = do
+parseTester :: Parser (Int -> Int)
+parseTester = do
     lexeme "Test: divisible by"
     modulus <- decimal
     lexeme "If true: throw to monkey"
@@ -110,16 +109,16 @@ test = do
             | x `rem` m == 0 = t
             | otherwise      = f
 
-oneMonkey :: Parser Monke
+oneMonkey :: Parser Monkey
 oneMonkey = do
     monkx
-    i <- items
-    o <- oper
-    t <- test
-    return (Monke 0 i o t)
+    i <- parseItems
+    o <- parseOper
+    t <- parseTester
+    return (Monkey 0 i o t)
 
 aocParse :: Parser ArrMonkey
-aocParse = try $ do
+aocParse = do
     mlst <- some oneMonkey
     eof
     let bndslst = (0, length mlst - 1)
