@@ -65,11 +65,9 @@ lexeme = L.lexeme $ L.space space1 empty empty
 decimal :: Parser Int
 decimal = lexeme L.decimal
 
-monkx :: Parser ()
-monkx = do
-    lexeme "Monkey"
-    decimal
-    void $ lexeme ":"
+parseIndex :: Parser ()
+parseIndex = do
+    void $ lexeme "Monkey" *> decimal *> lexeme ":"
 
 parseItems :: Parser [Int]
 parseItems = do
@@ -90,10 +88,11 @@ parseOper = do
     op <- lexeme asciiChar
     n <- lexeme $ some alphaNumChar
     let x = readMaybe n
-    return (case x of
-        Nothing  -> (\x -> x * x)
-        Just num -> if op == '+' then (+) num 
-                                 else (*) num)
+    pure $ case x of
+        Nothing  -> (\x -> x * x) -- "old", maybe hardcoded?
+        Just num -> if op == '+' 
+                    then (+) num 
+                    else (*) num
 
 parseTester :: Parser (Int -> Int)
 parseTester = do
@@ -103,7 +102,7 @@ parseTester = do
     onTrue  <- decimal
     lexeme "If false: throw to monkey"
     onFalse <- decimal
-    return $ makeTest modulus onTrue onFalse
+    pure $ makeTest modulus onTrue onFalse
     where 
         makeTest :: Int -> Int -> Int -> Int -> Int
         makeTest m t f x
@@ -112,15 +111,11 @@ parseTester = do
 
 oneMonkey :: Parser Monkey
 oneMonkey = do
-    monkx
-    i <- parseItems
-    o <- parseOper
-    t <- parseTester
-    return (Monkey 0 i o t)
+    parseIndex
+    Monkey 0 <$> parseItems <*> parseOper <*> parseTester
 
 aocParse :: Parser ArrMonkey
 aocParse = do
-    mlst <- some oneMonkey
-    eof
+    mlst <- some oneMonkey <* eof
     let bndslst = (0, length mlst - 1)
     return (array bndslst $ zip (range bndslst) $ mlst)
