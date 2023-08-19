@@ -43,7 +43,7 @@ monkeyBusiness iters trunc ma
     $ iterate (doRound trunc) ma !! iters
 
 doRound :: (Int -> Int) -> ArrMonkey -> ArrMonkey
-doRound trunc a = foldl (doInspection trunc) a $ indices a
+doRound trunc a = foldl' (doInspection trunc) a $ indices a
 
 doInspection :: (Int -> Int) -> ArrMonkey -> Int -> ArrMonkey
 doInspection trunc a i = case a!i of
