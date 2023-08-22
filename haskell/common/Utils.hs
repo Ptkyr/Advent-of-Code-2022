@@ -30,11 +30,20 @@ import Data.Ord (clamp)
 
 type Parser = Parsec Void Text
 
-lexeme :: Parser a -> Parser a
-lexeme = L.lexeme $ L.space space1 empty empty
+eatSome :: Parser ()
+eatSome = L.space space1 empty empty
 
-decimal :: Parser Int
-decimal = lexeme L.decimal
+eatMany :: Parser ()
+eatMany = L.space space empty empty
+
+lexeme :: Parser a -> Parser a
+lexeme = L.lexeme eatSome
+
+nat :: Parser Int
+nat = lexeme L.decimal
+
+int :: Parser Int
+int = L.signed eatMany nat
 
 type Arr2D a = Array (Int, Int) a
 

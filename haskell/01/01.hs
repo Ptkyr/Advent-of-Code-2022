@@ -2,22 +2,18 @@ import Utils
 
 main :: IO ()
 main = do
-    input <- readFile "01/input.txt"
-    let elves = cals 0 . parse $ input
-    print . partOne $ elves
-    print . partTwo $ elves
+    parsed <- runParser aocParse "" . pack <$> readFile "01/input.txt"
+    let Right elves = parsed
+    print $ partOne elves
+    print $ partTwo elves
 
--- Basically splitOn newline
-parse :: String -> [String]
-parse s = case break (== '\n') s of
-    (a, _ : b) -> a : parse b
-    (a, _)     -> [a]
-
--- Convert to each elf's calorie count
-cals :: Int -> [String] -> [Int]
-cals _ []        = []
-cals a ("" : xs) = a : cals 0 xs
-cals a (x : xs)  = cals (a + read x) xs
+aocParse :: Parser [Int]
+aocParse = do
+    map sum <$> oneElf `sepBy` newline <* eof
+    where
+    oneElf :: Parser [Int]
+    oneElf = do
+        (read <$> some digitChar) `endBy` newline
 
 partOne :: [Int] -> Int
 partOne = maximum

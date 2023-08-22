@@ -2,8 +2,7 @@ import Utils
 
 main :: IO ()
 main = do
-    input <- readFile "11/input.txt"
-    let parsed = runParser aocParse "" $ pack input
+    parsed <- runParser aocParse "" . pack <$> readFile "11/input.txt"
     let Right monkeys = parsed
     print $ partOne monkeys
     print $ partTwo monkeys
@@ -50,7 +49,7 @@ doInspection trunc am i = case am!i of
 -- All parsing from here
 parseItems :: Parser [Int]
 parseItems = do
-    lexeme "Starting items:" *> decimal `sepBy` lexeme ","
+    lexeme "Starting items:" *> nat `sepBy` lexeme ","
 
 parseOper :: Parser (Int -> Int)
 parseOper = do
@@ -58,16 +57,16 @@ parseOper = do
     operand  <- lexeme $ some alphaNumChar
     let mx = readMaybe operand
     pure $ case mx of
-        Nothing  -> (\x -> x * x) -- "old", maybe hardcoded and bad?
+        Nothing  -> (flip (^) 2) -- "old", maybe hardcoded and bad?
         Just num -> if operator == '+' 
                     then (+) num 
                     else (*) num
 
 parseTester :: Parser (Int -> Int)
 parseTester = do
-    makeTest <$> (lexeme "Test: divisible by"        *> decimal)
-             <*> (lexeme "If true: throw to monkey"  *> decimal)
-             <*> (lexeme "If false: throw to monkey" *> decimal)
+    makeTest <$> (lexeme "Test: divisible by"        *> nat)
+             <*> (lexeme "If true: throw to monkey"  *> nat)
+             <*> (lexeme "If false: throw to monkey" *> nat)
     where 
     makeTest :: Int -> Int -> Int -> Int -> Int
     makeTest m t f x
@@ -76,7 +75,7 @@ parseTester = do
 
 oneMonkey :: Parser Monkey
 oneMonkey = do
-    void $ lexeme "Monkey" *> decimal *> lexeme ":" 
+    void $ lexeme "Monkey" *> nat *> lexeme ":" 
     Monkey 0 <$> parseItems <*> parseOper <*> parseTester
 
 aocParse :: Parser ArrMonkey
