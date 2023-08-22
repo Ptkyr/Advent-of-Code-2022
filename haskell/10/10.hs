@@ -2,8 +2,8 @@ main :: IO ()
 main = do
     input <- readFile "10/input.txt"
     let asm = parse . words $ input
-    print . partOne $ asm
-    print . partTwo $ asm
+    print $ partOne asm
+    putStr $ partTwo asm
 
 type Act = Int -> Int
 type Inst = (Act, Int)
