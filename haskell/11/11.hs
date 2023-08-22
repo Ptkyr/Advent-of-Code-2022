@@ -57,7 +57,7 @@ parseOper = do
     operand  <- lexeme $ some alphaNumChar
     let mx = readMaybe operand
     pure $ case mx of
-        Nothing  -> (flip (^) 2) -- "old", maybe hardcoded and bad?
+        Nothing  -> (^ (2 :: Int)) -- "old", maybe hardcoded and bad?
         Just num -> if operator == '+' 
                     then (+) num 
                     else (*) num
