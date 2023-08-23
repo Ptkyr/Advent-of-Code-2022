@@ -7,38 +7,31 @@ main = do
     print $ partOne elves
     print $ partTwo elves
 
-data Pair = Pair
-    { _x1 :: Int
-    , _x2 :: Int
-    , _y1 :: Int
-    , _y2 :: Int
-    }
+type LinePair = (Int, Int, Int, Int)
 
-aocParse :: Parser [Pair]
+aocParse :: Parser [LinePair]
 aocParse = do
-    some parsePair <* eof
+    some parseLinePair <* eof
     where
-    parsePair :: Parser Pair
-    parsePair = do
-        Pair <$> nat 
-             <*> (lexeme "-" *> nat)
-             <*> (lexeme "," *> nat)
-             <*> (lexeme "-" *> nat)
+    parseLinePair :: Parser LinePair
+    parseLinePair = do
+        (, , ,) <$> nat <*> (lexeme "-" *> nat)
+                <*> (lexeme "," *> nat) <*> (lexeme "-" *> nat)
 
-partOne :: [Pair] -> Int
+partOne :: [LinePair] -> Int
 partOne = sum . map contains
     where
-    contains :: Pair -> Int
-    contains (Pair a1 a2 b1 b2)
+    contains :: LinePair -> Int
+    contains (a1, a2, b1, b2)
         | a1 <= b1 && b2 <= a2 = 1
         | b1 <= a1 && a2 <= b2 = 1
         | otherwise            = 0
 
-partTwo :: [Pair] -> Int
+partTwo :: [LinePair] -> Int
 partTwo = sum . map overlaps
     where
-    overlaps :: Pair -> Int
-    overlaps (Pair a1 a2 b1 b2)
+    overlaps :: LinePair -> Int
+    overlaps (a1, a2, b1, b2)
         | a2 <= b2 && a2 >= b1 = 1
         | a2 >= b2 && a1 <= b2 = 1
         | otherwise            = 0
