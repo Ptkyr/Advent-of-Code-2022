@@ -18,25 +18,16 @@ aocParse :: Parser [Inst]
 aocParse = many parseInst <* eof
     where
     parseInst :: Parser Inst
-    parseInst = noop <|> addx
-        where
-        noop = do 
-            void $ lexeme "noop"
-            pure $ Inst id 1
-        addx = do
-            void $ lexeme "addx"
-            n <- int
-            pure $ Inst ((+) n) 2
+    parseInst = choice
+        [ lexeme "noop" *> (pure $ Inst id 1)
+        , lexeme "addx" *> (flip Inst 2 <$> ((+) <$> int))
+        ]
 
 execute :: CPU -> [Inst] -> [CPU]
 execute _ []                 = []
-execute (x, c) (Inst i l : is) = (x, c) : execute newCPU newIns
-    where 
-        modify = l == 1
-        newCPU = if modify then (i x, c + 1) 
-                           else (x, c + 1)
-        newIns = if modify then is           
-                           else (Inst i $ l - 1) : is
+execute (x, c) (Inst i l : is)
+    | l == 1    = (x, c) : execute (i x, c + 1) is
+    | otherwise = (x, c) : execute (x, c + 1) ((Inst i $ l - 1) : is)
 
 partOne :: [Inst] -> Int
 partOne = sum . map report . execute (1, 1)
