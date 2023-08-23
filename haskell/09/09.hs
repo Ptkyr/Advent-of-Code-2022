@@ -2,8 +2,8 @@ import Utils
 
 main :: IO ()
 main = do
-    input <- readFile "09/input.txt"
-    let moves = parse $ words input
+    parsed <- parseInput aocParse "09/input.txt"
+    let Right moves = parsed
     print $ partOne moves
     print $ partTwo moves
 
@@ -11,16 +11,20 @@ type Coord = (Int, Int)
 type Stepper = Coord -> Coord
 type Move = (Stepper, Int)
 
-parse :: [String] -> [Move]
-parse (d : c : xs) =  (toStepper d, read c) : parse xs
+aocParse :: Parser [Move]
+aocParse = do
+    some parseMove <* eof
     where
-        toStepper :: String -> Stepper
-        toStepper "U" = (\(x, y) -> (x, y + 1))
-        toStepper "D" = (\(x, y) -> (x, y - 1))
-        toStepper "L" = (\(x, y) -> (x - 1, y))
-        toStepper "R" = (\(x, y) -> (x + 1, y))
-        toStepper _   = error "Unreachable"
-parse _            = []
+    parseMove :: Parser Move
+    parseMove = do
+        stepper <- choice
+            [ lexeme "U" *> (pure $ (\(x, y) -> (x, y + 1)))
+            , lexeme "D" *> (pure $ (\(x, y) -> (x, y - 1)))
+            , lexeme "L" *> (pure $ (\(x, y) -> (x - 1, y)))
+            , lexeme "R" *> (pure $ (\(x, y) -> (x + 1, y)))
+            ]
+        steps <- nat
+        pure $ (stepper, steps)
 
 partOne :: [Move] -> Int
 partOne = visited 2
@@ -41,12 +45,12 @@ tailPositions seen snake (m : ms) = tailPositions newSeen newSnake ms
     where (newSeen, newSnake) = execute m seen snake
 
 execute :: Move -> [Coord] -> [Coord] -> ([Coord], [Coord])
+execute _ _ []                     = error "Snake mutilated"
 execute (_, 0) seen snake      = (seen, snake)
 execute (f, n) seen (s : nake) = execute (f, n - 1) newSeen newSnake
     where
         newSeen = last newSnake : seen
         newSnake = slither $ (f s) : nake
-execute _ _ []                     = error "Snake mutilated"
 
 slither :: [Coord] -> [Coord]
 slither (hd : tl : r) = hd : slither (follow tl hd : r)
