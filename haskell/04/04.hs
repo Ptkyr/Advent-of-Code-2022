@@ -1,34 +1,44 @@
+import Utils
+
 main :: IO ()
 main = do
-    input <- readFile "04/input.txt"
-    let elves = parse input
+    parsed <- parseInput aocParse "04/input.txt"
+    let Right elves = parsed
     print $ partOne elves
     print $ partTwo elves
 
--- Basically splitOn
-parse :: String -> [Int]
-parse s = case break (\x -> x == '\n' || 
-                            x == ','  || 
-                            x == '-') s of
-    (a, _ : b) -> read a : parse b
-    (a, _)     -> [read a]
+data Pair = Pair
+    { _x1 :: Int
+    , _x2 :: Int
+    , _y1 :: Int
+    , _y2 :: Int
+    }
 
-partOne :: [Int] -> Int
-partOne (x : y : z : w : ss) = contains x y z w + partOne ss
+aocParse :: Parser [Pair]
+aocParse = do
+    some parsePair <* eof
     where
-    contains :: Int -> Int -> Int -> Int -> Int
-    contains a1 a2 b1 b2
+    parsePair :: Parser Pair
+    parsePair = do
+        Pair <$> nat 
+             <*> (lexeme "-" *> nat)
+             <*> (lexeme "," *> nat)
+             <*> (lexeme "-" *> nat)
+
+partOne :: [Pair] -> Int
+partOne = sum . map contains
+    where
+    contains :: Pair -> Int
+    contains (Pair a1 a2 b1 b2)
         | a1 <= b1 && b2 <= a2 = 1
         | b1 <= a1 && a2 <= b2 = 1
         | otherwise            = 0
-partOne _                    = 0
 
-partTwo :: [Int] -> Int
-partTwo (x : y : z : w : ss) = overlaps x y z w + partTwo ss
+partTwo :: [Pair] -> Int
+partTwo = sum . map overlaps
     where
-    overlaps :: Int -> Int -> Int -> Int -> Int
-    overlaps a1 a2 b1 b2
+    overlaps :: Pair -> Int
+    overlaps (Pair a1 a2 b1 b2)
         | a2 <= b2 && a2 >= b1 = 1
         | a2 >= b2 && a1 <= b2 = 1
         | otherwise            = 0
-partTwo _                    = 0
