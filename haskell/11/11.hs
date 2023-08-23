@@ -2,7 +2,7 @@ import Utils
 
 main :: IO ()
 main = do
-    parsed <- runParser aocParse "" . pack <$> readFile "11/input.txt"
+    parsed <- parseInput aocParse "11/input.txt"
     let Right monkeys = parsed
     print $ partOne monkeys
     print $ partTwo monkeys

@@ -2,8 +2,8 @@ main :: IO ()
 main = do
     input <- readFile "03/input.txt"
     let sacks = words input
-    print . partOne $ sacks
-    print . partTwo $ sacks
+    print $ partOne sacks
+    print $ partTwo sacks
 
 priority :: Char -> Int
 priority c
@@ -18,7 +18,7 @@ partOne = sum . map rucks
         where
         h = (length s) `div` 2
         common :: String -> String -> Int
-        common [] _     = -56
+        common [] _     = error "Unreachable"
         common (a : as) (bs)
             | elem a bs = priority a
             | otherwise = common as bs
@@ -27,8 +27,8 @@ partTwo :: [String] -> Int
 partTwo (a : b : c : ss) = sack3 a b c + partTwo ss
     where
     sack3 :: String -> String -> String -> Int
-    sack3 [] _ _               = -56
+    sack3 [] _ _               = error "Unreachable"
     sack3 (x : xs) y z
         | elem x y && elem x z = priority x
         | otherwise            = sack3 xs y z
-partTwo _                = 0
+partTwo _                      = 0

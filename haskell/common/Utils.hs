@@ -27,6 +27,7 @@ import Data.List
 import Data.Array
 import Control.Applicative
 import Data.Ord (clamp)
+import Data.Either
 
 type Parser = Parsec Void Text
 
@@ -55,3 +56,5 @@ zipWithArr f a1 a2 = array bnds
         bnds = bounds a1
         rang = range bnds
         lf = liftA2 f (a1 !) (a2 !)
+
+parseInput parser file = runParser parser "" . pack <$> readFile file

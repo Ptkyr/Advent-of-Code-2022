@@ -1,9 +1,9 @@
 main :: IO ()
 main = do
     input <- readFile "04/input.txt"
-    let elves = parse $ input
-    print . partOne $ elves
-    print . partTwo $ elves
+    let elves = parse input
+    print $ partOne elves
+    print $ partTwo elves
 
 -- Basically splitOn
 parse :: String -> [Int]

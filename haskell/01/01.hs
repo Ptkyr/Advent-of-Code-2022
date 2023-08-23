@@ -2,7 +2,7 @@ import Utils
 
 main :: IO ()
 main = do
-    parsed <- runParser aocParse "" . pack <$> readFile "01/input.txt"
+    parsed <- parseInput aocParse "01/input.txt"
     let Right elves = parsed
     print $ partOne elves
     print $ partTwo elves

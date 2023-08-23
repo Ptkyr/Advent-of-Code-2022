@@ -3,9 +3,9 @@ import Utils
 main :: IO ()
 main = do
     input <- readFile "09/input.txt"
-    let moves = parse . words $ input
-    print . partOne $ moves
-    print . partTwo $ moves
+    let moves = parse $ words input
+    print $ partOne moves
+    print $ partTwo moves
 
 type Coord = (Int, Int)
 type Stepper = Coord -> Coord
