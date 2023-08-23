@@ -43,7 +43,7 @@ nat :: Parser Int
 nat = lexeme L.decimal
 
 int :: Parser Int
-int = L.signed eatMany nat
+int = L.signed eatSome nat
 
 type Arr2D a = Array (Int, Int) a
 
