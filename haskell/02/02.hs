@@ -7,10 +7,7 @@ main = do
     print $ partOne rps
     print $ partTwo rps
 
-data RPS = RPS
-    { _foe :: Int
-    , _me  :: Int
-    }
+type RPS = (Int, Int)
 
 aocParse :: Parser [RPS]
 aocParse = do
@@ -20,17 +17,17 @@ aocParse = do
     oneRPS = do 
         f <- lexeme upperChar
         m <- lexeme upperChar
-        pure $ RPS (fromEnum f - fromEnum 'A') (fromEnum m - fromEnum 'X')
+        pure $ (fromEnum f - fromEnum 'A', fromEnum m - fromEnum 'X')
 
 partOne :: [RPS] -> Int
 partOne = sum . map toScore
     where
     toScore :: RPS -> Int
-    toScore (RPS f m) = (m' - f) `mod` 3 * 3 + m'
+    toScore (f, m) = (m' - f) `mod` 3 * 3 + m'
         where m' = m + 1
 
 partTwo :: [RPS] -> Int
 partTwo = sum . map toScore
     where
     toScore :: RPS -> Int
-    toScore (RPS f m) = (f + m - 1) `mod` 3 + m * 3 + 1
+    toScore (f, m) = (f + m - 1) `mod` 3 + m * 3 + 1
