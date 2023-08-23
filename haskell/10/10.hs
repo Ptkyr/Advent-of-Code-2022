@@ -12,8 +12,8 @@ main = do
 type CPU = (Int, Int)
 
 data Inst = Inst
-    { _action :: Int -> Int
-    , _cycles :: Int
+    { _cycles :: Int
+    , _action :: Int -> Int
     }
 
 aocParse :: Parser [Inst]
@@ -21,15 +21,16 @@ aocParse = many parseInst <* eof
     where
     parseInst :: Parser Inst
     parseInst = choice
-        [ lexeme "noop" *> (pure $ Inst id 1)
-        , lexeme "addx" *> (flip Inst 2 <$> ((+) <$> int))
+        [ lexeme "noop" *> (pure $ Inst 1 id)
+        , lexeme "addx" *> (Inst 2 <$> ((+) <$> int))
         ]
 
 execute :: CPU -> [Inst] -> [CPU]
 execute _ []                 = []
-execute (x, c) (Inst i l : is)
-    | l == 1    = (x, c) : execute (i x, c + 1) is
-    | otherwise = (x, c) : execute (x, c + 1) ((Inst i $ l - 1) : is)
+execute (x, c) (Inst cyc act : is)
+    | cyc == 1    = (x, c) : execute (act x, c') is
+    | otherwise   = (x, c) : execute (x, c') ((Inst (cyc - 1) act) : is)
+    where c' = c + 1
 
 partOne :: [Inst] -> Int
 partOne = sum . map report . execute (1, 1)
