@@ -1,30 +1,36 @@
+import Utils
+
 main :: IO ()
 main = do
-    input <- readFile "02/input.txt"
-    let rps = words $ input
-    print . partOne $ rps
-    print . partTwo $ rps
+    parsed <- runParser aocParse "" . pack <$> readFile "02/input.txt"
+    let Right rps = parsed
+    print $ partOne rps
+    print $ partTwo rps
 
-partOne :: [String] -> Int
-partOne ("A" : "X" : s) = 4 + partOne s
-partOne ("A" : "Y" : s) = 8 + partOne s
-partOne ("A" : "Z" : s) = 3 + partOne s
-partOne ("B" : "X" : s) = 1 + partOne s
-partOne ("B" : "Y" : s) = 5 + partOne s
-partOne ("B" : "Z" : s) = 9 + partOne s
-partOne ("C" : "X" : s) = 7 + partOne s
-partOne ("C" : "Y" : s) = 2 + partOne s
-partOne ("C" : "Z" : s) = 6 + partOne s
-partOne _               = 0
+data RPS = RPS
+    { _foe :: Int
+    , _me  :: Int
+    }
 
-partTwo :: [String] -> Int
-partTwo ("A" : "X" : s) = 3 + partTwo s
-partTwo ("A" : "Y" : s) = 4 + partTwo s
-partTwo ("A" : "Z" : s) = 8 + partTwo s
-partTwo ("B" : "X" : s) = 1 + partTwo s
-partTwo ("B" : "Y" : s) = 5 + partTwo s
-partTwo ("B" : "Z" : s) = 9 + partTwo s
-partTwo ("C" : "X" : s) = 2 + partTwo s
-partTwo ("C" : "Y" : s) = 6 + partTwo s
-partTwo ("C" : "Z" : s) = 7 + partTwo s
-partTwo _               = 0
+aocParse :: Parser [RPS]
+aocParse = do
+    some oneRPS <* eof
+    where
+    oneRPS :: Parser RPS
+    oneRPS = do 
+        f <- lexeme upperChar
+        m <- lexeme upperChar
+        pure $ RPS (fromEnum f - fromEnum 'A') (fromEnum m - fromEnum 'X')
+
+partOne :: [RPS] -> Int
+partOne = sum . map toScore
+    where
+    toScore :: RPS -> Int
+    toScore (RPS f m) = 3 * ((m' - f) `mod` 3) + m'
+        where m' = m + 1
+
+partTwo :: [RPS] -> Int
+partTwo = sum . map toScore
+    where
+    toScore :: RPS -> Int
+    toScore (RPS f m) = 3 * m + (f + m - 1) `mod` 3 + 1
