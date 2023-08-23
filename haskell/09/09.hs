@@ -8,6 +8,7 @@ main = do
     print $ partTwo moves
 
 type Coord = (Int, Int)
+type Snake = [Coord]
 type Stepper = Coord -> Coord
 type Move = (Stepper, Int)
 
@@ -18,10 +19,10 @@ aocParse = do
     parseMove :: Parser Move
     parseMove = do
         stepper <- choice
-            [ lexeme "U" *> (pure $ (\(x, y) -> (x, y + 1)))
-            , lexeme "D" *> (pure $ (\(x, y) -> (x, y - 1)))
-            , lexeme "L" *> (pure $ (\(x, y) -> (x - 1, y)))
-            , lexeme "R" *> (pure $ (\(x, y) -> (x + 1, y)))
+            [ lexeme "U" *> (pure $ \(x, y) -> (x, y + 1))
+            , lexeme "D" *> (pure $ \(x, y) -> (x, y - 1))
+            , lexeme "L" *> (pure $ \(x, y) -> (x - 1, y))
+            , lexeme "R" *> (pure $ \(x, y) -> (x + 1, y))
             ]
         steps <- nat
         pure $ (stepper, steps)
@@ -39,12 +40,12 @@ visited snakeLen = length
                  . tailPositions [origin] (replicate snakeLen origin)
     where origin = (0, 0)
 
-tailPositions :: [Coord] -> [Coord] -> [Move] -> [Coord]
+tailPositions :: [Coord] -> Snake -> [Move] -> [Coord]
 tailPositions seen _ []           = seen
 tailPositions seen snake (m : ms) = tailPositions newSeen newSnake ms
     where (newSeen, newSnake) = execute m seen snake
 
-execute :: Move -> [Coord] -> [Coord] -> ([Coord], [Coord])
+execute :: Move -> [Coord] -> Snake -> ([Coord], Snake)
 execute _ _ []                     = error "Snake mutilated"
 execute (_, 0) seen snake      = (seen, snake)
 execute (f, n) seen (s : nake) = execute (f, n - 1) newSeen newSnake
@@ -52,7 +53,7 @@ execute (f, n) seen (s : nake) = execute (f, n - 1) newSeen newSnake
     newSeen = last newSnake : seen
     newSnake = slither $ (f s) : nake
 
-slither :: [Coord] -> [Coord]
+slither :: Snake -> Snake
 slither (hd : tl : r) = hd : slither (follow tl hd : r)
 slither end           = end
 
