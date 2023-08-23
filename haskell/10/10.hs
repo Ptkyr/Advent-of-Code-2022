@@ -2,8 +2,6 @@ import Utils
 
 main :: IO ()
 main = do
-    --parsed <- runParser aocParse "" . pack <$> readFile "10/input.txt"
-    --let Right asm = parsed
     parsed <- parseInput aocParse "10/input.txt"
     let Right asm = parsed
     print $ partOne asm
