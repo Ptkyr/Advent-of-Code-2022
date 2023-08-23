@@ -20,14 +20,12 @@ aocParse = do
     where
     parseMove :: Parser Move
     parseMove = do
-        stepper <- choice
+        ( , ) <$> choice
             [ lexeme "U" *> (pure $ \(x, y) -> (x, y + 1))
             , lexeme "D" *> (pure $ \(x, y) -> (x, y - 1))
             , lexeme "L" *> (pure $ \(x, y) -> (x - 1, y))
             , lexeme "R" *> (pure $ \(x, y) -> (x + 1, y))
-            ]
-        steps <- nat
-        pure $ (stepper, steps)
+            ] <*> nat
 
 partOne :: [Move] -> Int
 partOne = visited 2
@@ -48,7 +46,7 @@ tailPositions seen snake (m : ms) = tailPositions newSeen newSnake ms
     where (newSeen, newSnake) = execute m seen snake
 
 execute :: Move -> [Coord] -> Snake -> ([Coord], Snake)
-execute _ _ []                     = error "Snake mutilated"
+execute _ _ []                 = error "Snake mutilated"
 execute (_, 0) seen snake      = (seen, snake)
 execute (f, n) seen (s : nake) = execute (f, n - 1) newSeen newSnake
     where

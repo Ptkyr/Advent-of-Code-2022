@@ -43,14 +43,14 @@ valueAt edge halt recur fx fy forest
     | i <- [x..x']
     , j <- [y..y']]
     where
-        bnds@((x, y), (x', y')) = bounds forest
-        -- wave; go from (u, v) to the edge, stepping with fx/fy
-        wave :: Int -> Int -> Int -> Int
-        wave t u v
-            | not $ inRange bnds (u, v) = edge
-            | t <= forest!(u, v)          = halt
-            | otherwise                   = recur 1 $ wave t nx ny
-            where (nx, ny) = (fx u, fy v)
+    bnds@((x, y), (x', y')) = bounds forest
+    -- wave; go from (u, v) to the edge, stepping with fx/fy
+    wave :: Int -> Int -> Int -> Int
+    wave t u v
+        | not $ inRange bnds (u, v) = edge
+        | t <= forest!(u, v)          = halt
+        | otherwise                   = recur 1 $ wave t nx ny
+        where (nx, ny) = (fx u, fy v)
 
 visDir :: (Int -> Int) -> (Int -> Int) -> Arr2D Int -> Arr2D Int
 visDir   = valueAt 1 0 (*) 
