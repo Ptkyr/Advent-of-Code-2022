@@ -8,26 +8,22 @@ main = do
     putStr $ partTwo asm
 
 type CPU = (Int, Int)
-
-data Inst = Inst
-    { _cycles :: Int
-    , _action :: Int -> Int
-    }
+type Inst = (Int -> Int, Int)
 
 aocParse :: Parser [Inst]
 aocParse = many parseInst <* eof
     where
     parseInst :: Parser Inst
     parseInst = choice
-        [ lexeme "noop" *> (pure $ Inst 1 id)
-        , lexeme "addx" *> (Inst 2 <$> ((+) <$> int))
+        [ lexeme "noop" *> (pure (id, 1))
+        , lexeme "addx" *> ((, 2) <$> ((+) <$> int))
         ]
 
 execute :: CPU -> [Inst] -> [CPU]
 execute _ []                 = []
-execute cpu@(x, c) (Inst cyc act : is)
+execute cpu@(x, c) ((act, cyc) : is)
     | cyc == 1    = cpu : execute (act x, c') is
-    | otherwise   = cpu : execute (x, c') (Inst (cyc - 1) act : is)
+    | otherwise   = cpu : execute (x, c') ((act, cyc - 1) : is)
     where c' = c + 1
 
 partOne :: [Inst] -> Int
