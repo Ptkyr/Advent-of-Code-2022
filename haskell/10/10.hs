@@ -3,9 +3,11 @@ import Utils
 main :: IO ()
 main = do
     parsed <- parseInput aocParse "10/input.txt"
-    let Right asm = parsed
-    print $ partOne asm
-    putStr $ partTwo asm
+    case parsed of
+        Left pError -> putStr $ errorBundlePretty pError
+        Right input -> do
+            print $ partOne input
+            putStr $ partTwo input
 
 type CPU = (Int, Int)
 type Inst = (Int -> Int, Int)

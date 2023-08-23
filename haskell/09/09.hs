@@ -3,9 +3,11 @@ import Utils
 main :: IO ()
 main = do
     parsed <- parseInput aocParse "09/input.txt"
-    let Right moves = parsed
-    print $ partOne moves
-    print $ partTwo moves
+    case parsed of
+        Left pError -> putStr $ errorBundlePretty pError
+        Right input -> do
+            print $ partOne input
+            print $ partTwo input
 
 type Coord = (Int, Int)
 type Snake = [Coord]

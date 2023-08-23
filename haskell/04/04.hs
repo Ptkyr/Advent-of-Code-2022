@@ -3,9 +3,11 @@ import Utils
 main :: IO ()
 main = do
     parsed <- parseInput aocParse "04/input.txt"
-    let Right elves = parsed
-    print $ partOne elves
-    print $ partTwo elves
+    case parsed of
+        Left pError -> putStr $ errorBundlePretty pError
+        Right input -> do
+            print $ partOne input
+            print $ partTwo input
 
 type LinePair = (Int, Int, Int, Int)
 

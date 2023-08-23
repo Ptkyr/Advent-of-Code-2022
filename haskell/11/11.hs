@@ -3,9 +3,11 @@ import Utils
 main :: IO ()
 main = do
     parsed <- parseInput aocParse "11/input.txt"
-    let Right monkeys = parsed
-    print $ partOne monkeys
-    print $ partTwo monkeys
+    case parsed of
+        Left pError -> putStr $ errorBundlePretty pError
+        Right input -> do
+            print $ partOne input
+            print $ partTwo input
 
 data Monkey = Monkey
     { activity :: Int
