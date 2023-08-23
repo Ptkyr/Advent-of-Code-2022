@@ -53,8 +53,9 @@ zipWithArr f a1 a2 = array bnds
                    $ zip rang
                    $ fmap lf rang
     where
-        bnds = bounds a1
-        rang = range bnds
-        lf = liftA2 f (a1 !) (a2 !)
+    bnds = bounds a1
+    rang = range bnds
+    lf = liftA2 f (a1 !) (a2 !)
 
-parseInput parser file = runParser parser "" . pack <$> readFile file
+parseInput :: Parser a -> String -> IO (Either (ParseErrorBundle Text Void) a)
+parseInput parser file = runParser parser file . pack <$> readFile file
