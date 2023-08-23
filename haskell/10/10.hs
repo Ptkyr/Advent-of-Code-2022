@@ -25,9 +25,9 @@ aocParse = many parseInst <* eof
 
 execute :: CPU -> [Inst] -> [CPU]
 execute _ []                 = []
-execute (x, c) (Inst cyc act : is)
-    | cyc == 1    = (x, c) : execute (act x, c') is
-    | otherwise   = (x, c) : execute (x, c') ((Inst (cyc - 1) act) : is)
+execute cpu@(x, c) (i@(Inst cyc act) : is)
+    | cyc == 1    = cpu : execute (act x, c') is
+    | otherwise   = cpu : execute (x, c') (i {_cycles = cyc - 1} : is)
     where c' = c + 1
 
 partOne :: [Inst] -> Int
