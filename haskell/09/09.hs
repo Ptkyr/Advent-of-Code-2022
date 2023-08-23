@@ -49,8 +49,8 @@ execute _ _ []                     = error "Snake mutilated"
 execute (_, 0) seen snake      = (seen, snake)
 execute (f, n) seen (s : nake) = execute (f, n - 1) newSeen newSnake
     where
-        newSeen = last newSnake : seen
-        newSnake = slither $ (f s) : nake
+    newSeen = last newSnake : seen
+    newSnake = slither $ (f s) : nake
 
 slither :: [Coord] -> [Coord]
 slither (hd : tl : r) = hd : slither (follow tl hd : r)
@@ -61,6 +61,6 @@ follow (x, y) (hx, hy)
     | abs dx < 2 && abs dy < 2 = (x, y) -- Only move when necessary
     | otherwise                = (x + step dx, y + step dy)
     where
-        (dx, dy) = (hx - x, hy - y)
-        step :: Int -> Int
-        step = clamp (-1, 1)
+    (dx, dy) = (hx - x, hy - y)
+    step :: Int -> Int
+    step = clamp (-1, 1)
