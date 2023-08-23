@@ -26,11 +26,11 @@ partOne :: [RPS] -> Int
 partOne = sum . map toScore
     where
     toScore :: RPS -> Int
-    toScore (RPS f m) = 3 * ((m' - f) `mod` 3) + m'
+    toScore (RPS f m) = (m' - f) `mod` 3 * 3 + m'
         where m' = m + 1
 
 partTwo :: [RPS] -> Int
 partTwo = sum . map toScore
     where
     toScore :: RPS -> Int
-    toScore (RPS f m) = 3 * m + (f + m - 1) `mod` 3 + 1
+    toScore (RPS f m) = (f + m - 1) `mod` 3 + m * 3 + 1
