@@ -81,5 +81,5 @@ oneMonkey = do
 aocParse :: Parser ArrMonkey
 aocParse = do
     mlst <- some oneMonkey <* eof
-    let bndslst = (0, length mlst - 1)
-    pure $ array bndslst $ zip (range bndslst) $ mlst
+    let bnds = (0, length mlst - 1)
+    pure $ array bnds $ zip (range bnds) $ mlst
