@@ -16,15 +16,13 @@ data Monkey = Monkey
     , _tester  :: Int -> Int
     }
 
-type ArrMonkey = Array Int Monkey
-
-partOne :: ArrMonkey -> Int
+partOne :: Arr Monkey -> Int
 partOne = monkeyBusiness 20 (flip div 3)
 
-partTwo :: ArrMonkey -> Int
+partTwo :: Arr Monkey -> Int
 partTwo = monkeyBusiness 10000 (flip rem 9699690) -- To-do: not hardcoded
 
-monkeyBusiness :: Int -> (Int -> Int) -> ArrMonkey -> Int
+monkeyBusiness :: Int -> (Int -> Int) -> Arr Monkey -> Int
 monkeyBusiness iters trunc am
     = product 
     . take 2 
@@ -33,10 +31,10 @@ monkeyBusiness iters trunc am
     . elems 
     $ iterate (doRound trunc) am !! iters
 
-doRound :: (Int -> Int) -> ArrMonkey -> ArrMonkey
+doRound :: (Int -> Int) -> Arr Monkey -> Arr Monkey
 doRound trunc am = foldl' (doInspection trunc) am $ indices am
 
-doInspection :: (Int -> Int) -> ArrMonkey -> Int -> ArrMonkey
+doInspection :: (Int -> Int) -> Arr Monkey -> Int -> Arr Monkey
 doInspection trunc am i = case am!i of
     (Monkey _ [] _ _)         -> am
     (Monkey act (x : xs) o t) -> doInspection trunc (am // [cur, new]) i
@@ -80,7 +78,7 @@ oneMonkey = do
     void $ lexeme "Monkey" *> nat *> lexeme ":" 
     Monkey 0 <$> parseItems <*> parseOper <*> parseTester
 
-aocParse :: Parser ArrMonkey
+aocParse :: Parser (Arr Monkey)
 aocParse = do
     mlst <- some oneMonkey <* eof
     let bnds = (0, length mlst - 1)

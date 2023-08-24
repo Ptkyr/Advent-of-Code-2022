@@ -63,6 +63,7 @@ parseInput :: Parser a -> String -> IO (Either (ParseErrorBundle Text Void) a)
 parseInput parser file = runParser parser file . pack <$> readFile file
 
 -- Array util
+type Arr a   = Array Int a
 type Arr2D a = Array (Int, Int) a
 
 zipWithArr :: (a -> b -> c) -> Arr2D a -> Arr2D b -> Arr2D c

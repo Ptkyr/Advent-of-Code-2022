@@ -8,6 +8,38 @@ main = do
     let initBoxes = parseConfig (replicate 9 []) . init $ parse config
     print . partOne initBoxes $ cmds
     print . partTwo initBoxes $ cmds
+    parsed <- parseInput aocParse "05/input.txt"
+    case parsed of
+        Left pError -> putStr $ errorBundlePretty pError
+        Right input -> print $ fst input
+
+type Info   = ([Crates], [Move])
+type Crates = String
+data Move = Move
+    { _num :: Int
+    , _frm :: Int
+    , _to  :: Int
+    } deriving (Show)
+
+aocParse :: Parser Info
+aocParse = do
+    (, ) <$> foldl' (zipWith (++)) (repeat []) <$> parseCrates
+         <*> (space1 *> some (lexeme nat) *> some parseMove <* eof)
+    where
+    parseMove :: Parser Move
+    parseMove = do
+        Move <$> (lexeme "move" *> nat)
+             <*> (lexeme "from" *> nat)
+             <*> (lexeme "to"   *> nat)
+    parseCrates :: Parser [[Crates]]
+    parseCrates = do
+        (parseBox `sepBy` char ' ') `endBy` newline
+        where
+        parseBox :: Parser Crates
+        parseBox = choice
+            [ char '[' *> some upperChar <* char ']'
+            , string "   " *> (pure []) -- annoying
+            ]
 
 -- <Parsing>
 -- Initialize boxes
