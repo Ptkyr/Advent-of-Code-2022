@@ -29,6 +29,7 @@ import Control.Applicative
 import Data.Ord (clamp)
 import Data.Either
 
+-- Parser util
 type Parser = Parsec Void Text
 
 eatSome :: Parser ()
@@ -40,12 +41,28 @@ eatMany = L.space space empty empty
 lexeme :: Parser a -> Parser a
 lexeme = L.lexeme eatSome
 
+symbol :: Text -> Parser Text
+symbol = L.symbol eatSome
+
 nat :: Parser Int
 nat = lexeme L.decimal
 
 int :: Parser Int
 int = L.signed eatSome nat
 
+brackets :: Parser a -> Parser a
+brackets = between (symbol "[") (symbol "]")
+
+parens :: Parser a -> Parser a
+parens = between (symbol "(") (symbol ")")
+
+braces :: Parser a -> Parser a
+braces = between (symbol "{") (symbol "}")
+
+parseInput :: Parser a -> String -> IO (Either (ParseErrorBundle Text Void) a)
+parseInput parser file = runParser parser file . pack <$> readFile file
+
+-- Array util
 type Arr2D a = Array (Int, Int) a
 
 zipWithArr :: (a -> b -> c) -> Arr2D a -> Arr2D b -> Arr2D c
@@ -56,6 +73,3 @@ zipWithArr f a1 a2 = array bnds
     bnds = bounds a1
     rang = range bnds
     lf = liftA2 f (a1 !) (a2 !)
-
-parseInput :: Parser a -> String -> IO (Either (ParseErrorBundle Text Void) a)
-parseInput parser file = runParser parser file . pack <$> readFile file
