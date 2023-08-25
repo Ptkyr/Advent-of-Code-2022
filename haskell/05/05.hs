@@ -30,10 +30,10 @@ execute func (ac, m : ms) = execute func (doMove func m ac, ms)
 doMove :: (Crates -> Crates) -> Move -> Arr Crates -> Arr Crates
 doMove func (Move num from to) ac = ac // [(from, newFrom), (to, newTo)]
     where
-    fromCrates       = ac!from
-    toCrates         = ac!to
-    (moving,newFrom) = splitAt num fromCrates
-    newTo            = func moving ++ toCrates
+    fromCrates        = ac!from
+    toCrates          = ac!to
+    (moving, newFrom) = splitAt num fromCrates
+    newTo             = func moving ++ toCrates
     
 aocParse :: Parser Info
 aocParse = do
