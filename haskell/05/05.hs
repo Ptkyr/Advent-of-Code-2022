@@ -42,17 +42,17 @@ aocParse = do
     moves  <- some parseMove <* eof
     pure (listArray (1, length crates) crates, moves)
     where
+    parseCrates :: Parser [[Crates]]
+    parseCrates = do
+        (oneCrate `sepBy` char ' ') `endBy` newline
+        where
+        oneCrate :: Parser Crates
+        oneCrate = choice
+            [ char '[' *> some upperChar <* char ']'
+            , string "   " *> (pure []) -- for the ++ later
+            ]
     parseMove :: Parser Move
     parseMove = do
         Move <$> (lexeme "move" *> nat)
              <*> (lexeme "from" *> nat)
              <*> (lexeme "to"   *> nat)
-    parseCrates :: Parser [[Crates]]
-    parseCrates = do
-        (parseBox `sepBy` char ' ') `endBy` newline
-        where
-        parseBox :: Parser Crates
-        parseBox = choice
-            [ char '[' *> some upperChar <* char ']'
-            , string "   " *> (pure []) -- annoying but I gotta
-            ]
