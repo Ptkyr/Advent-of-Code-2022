@@ -8,12 +8,9 @@ main = do
     print $ partTwo forest
 
 parseToArr :: [String] -> Arr2D Int
-parseToArr s = array bnds 
-             $ zip rang
+parseToArr s = listArray ((1, 1), (x, y)) 
              $ concat $ map (map digitToInt) s
     where
-        bnds = ((1, 1), (x, y))
-        rang = range bnds
         x = length s
         y = length $ head s
 
