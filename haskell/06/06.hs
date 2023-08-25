@@ -2,9 +2,12 @@ import Utils
 
 main :: IO ()
 main = do
-    input <- readFile "06/input.txt"
-    print $ partOne input
-    print $ partTwo input
+    parsed <- parseInput aocParse "06/input.txt"
+    case parsed of
+        Left pError -> putStr $ errorBundlePretty pError
+        Right input -> do
+            print $ partOne input
+            print $ partTwo input
 
 partOne :: String -> Int
 partOne = uniq 4 4
@@ -19,3 +22,7 @@ uniq c x str@(_ : ss)
     | otherwise = uniq c (x + 1) ss
     where 
     u = length . group . sort $ take c str
+
+aocParse :: Parser String
+aocParse = do
+    some letterChar <* newline <* eof
