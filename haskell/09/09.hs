@@ -14,19 +14,6 @@ type Snake = [Coord]
 type Stepper = Coord -> Coord
 type Move = (Stepper, Int)
 
-aocParse :: Parser [Move]
-aocParse = do
-    some parseMove <* eof
-    where
-    parseMove :: Parser Move
-    parseMove = do
-        ( , ) <$> choice
-            [ lexeme "U" *> (pure $ \(x, y) -> (x, y + 1))
-            , lexeme "D" *> (pure $ \(x, y) -> (x, y - 1))
-            , lexeme "L" *> (pure $ \(x, y) -> (x - 1, y))
-            , lexeme "R" *> (pure $ \(x, y) -> (x + 1, y))
-            ] <*> nat
-
 partOne :: [Move] -> Int
 partOne = visited 2
 
@@ -65,3 +52,16 @@ follow (x, y) (hx, hy)
     (dx, dy) = (hx - x, hy - y)
     step :: Int -> Int
     step = clamp (-1, 1)
+
+aocParse :: Parser [Move]
+aocParse = do
+    some parseMove <* eof
+    where
+    parseMove :: Parser Move
+    parseMove = do
+        ( , ) <$> choice
+            [ lexeme "U" *> (pure $ \(x, y) -> (x, y + 1))
+            , lexeme "D" *> (pure $ \(x, y) -> (x, y - 1))
+            , lexeme "L" *> (pure $ \(x, y) -> (x - 1, y))
+            , lexeme "R" *> (pure $ \(x, y) -> (x + 1, y))
+            ] <*> nat

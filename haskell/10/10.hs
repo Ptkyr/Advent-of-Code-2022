@@ -12,15 +12,6 @@ main = do
 type CPU = (Int, Int)
 type Inst = (Int -> Int, Int)
 
-aocParse :: Parser [Inst]
-aocParse = many parseInst <* eof
-    where
-    parseInst :: Parser Inst
-    parseInst = choice
-        [ lexeme "noop" *> (pure (id, 1))
-        , lexeme "addx" *> ((, 2) <$> ((+) <$> int))
-        ]
-
 execute :: CPU -> [Inst] -> [CPU]
 execute _ []                 = []
 execute cpu@(x, c) ((act, cyc) : is)
@@ -46,3 +37,12 @@ partTwo = concat . map drawer . execute (1, 1)
                                  else ""
         disply = if abs (x - crtPos) < 2 then "#"
                                          else "."
+
+aocParse :: Parser [Inst]
+aocParse = many parseInst <* eof
+    where
+    parseInst :: Parser Inst
+    parseInst = choice
+        [ lexeme "noop" *> (pure (id, 1))
+        , lexeme "addx" *> ((, 2) <$> ((+) <$> int))
+        ]

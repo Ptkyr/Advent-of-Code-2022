@@ -11,23 +11,6 @@ main = do
 
 type Rucksack = [Int]
 
-aocParse :: Parser [Rucksack]
-aocParse = do
-    parseRuck `endBy` newline <* eof
-    where
-    parseRuck :: Parser Rucksack
-    parseRuck = do
-        map priority <$> some letterChar
-        where
-        priority :: Char -> Int
-        priority c
-            | c >= 'A' && c <= 'Z' = c' - intA + 27
-            | otherwise            = c' - inta + 1
-            where
-            c'   = fromEnum c
-            inta = fromEnum 'a' 
-            intA = fromEnum 'A'
-
 partOne :: [Rucksack] -> Int
 partOne = sum . map rucks
     where 
@@ -50,3 +33,20 @@ partTwo (a : b : c : ss) = sack3 a b c + partTwo ss
         | elem x y && elem x z = x
         | otherwise            = sack3 xs y z
 partTwo _                      = 0
+
+aocParse :: Parser [Rucksack]
+aocParse = do
+    parseRuck `endBy` newline <* eof
+    where
+    parseRuck :: Parser Rucksack
+    parseRuck = do
+        map priority <$> some letterChar
+        where
+        priority :: Char -> Int
+        priority c
+            | c >= 'A' && c <= 'Z' = c' - intA + 27
+            | otherwise            = c' - inta + 1
+            where
+            c'   = fromEnum c
+            inta = fromEnum 'a' 
+            intA = fromEnum 'A'

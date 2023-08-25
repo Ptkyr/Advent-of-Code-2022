@@ -11,15 +11,6 @@ main = do
 
 type LinePair = (Int, Int, Int, Int)
 
-aocParse :: Parser [LinePair]
-aocParse = do
-    some parseLinePair <* eof
-    where
-    parseLinePair :: Parser LinePair
-    parseLinePair = do
-        (, , ,) <$> nat <*> (lexeme "-" *> nat)
-                <*> (lexeme "," *> nat) <*> (lexeme "-" *> nat)
-
 partOne :: [LinePair] -> Int
 partOne = sum . map contains
     where
@@ -37,3 +28,12 @@ partTwo = sum . map overlaps
         | a2 <= b2 && a2 >= b1 = 1
         | a2 >= b2 && a1 <= b2 = 1
         | otherwise            = 0
+
+aocParse :: Parser [LinePair]
+aocParse = do
+    some parseLinePair <* eof
+    where
+    parseLinePair :: Parser LinePair
+    parseLinePair = do
+        (, , ,) <$> nat <*> (lexeme "-" *> nat)
+                <*> (lexeme "," *> nat) <*> (lexeme "-" *> nat)
