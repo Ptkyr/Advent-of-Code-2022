@@ -28,6 +28,10 @@ import Data.Array
 import Control.Applicative
 import Data.Ord (clamp)
 import Data.Either
+import qualified Data.PriorityQueue.FingerTree as PQ
+
+clamp2D :: ((Int, Int), (Int, Int)) -> (Int, Int) -> (Int, Int)
+clamp2D ((x, y), (x', y')) (a, b) = (clamp (x, x') a, clamp (y, y') b)
 
 -- Parser util
 type Parser = Parsec Void Text
@@ -83,13 +87,59 @@ listArr2D1 :: (a -> b) -> [[a]] -> Arr2D b
 listArr2D1 f arr = listArray ((1, 1), (x, y)) 
                  $ concat $ map (map f) arr
     where
-    x = length $ head arr
-    y = length arr
+    x = length arr
+    y = length $ head arr
 
 -- Construct a (0, 0)-indexed 2D array
 listArr2D0 :: (a -> b) -> [[a]] -> Arr2D b
 listArr2D0 f arr = listArray ((0, 0), (x - 1, y - 1))
                  $ concat $ map (map f) arr
     where
-    x = length $ head arr
-    y = length arr
+    x = length arr
+    y = length $ head arr
+
+-- Dijkstra's
+type Coord = (Int, Int)
+type Graph = Arr2D Node
+type Node  = Char
+
+neighbours :: Graph -> Coord -> (Node -> Node -> Bool) -> [Coord]
+neighbours graph v@(vx, vy) fltr 
+    = filter liftFilter
+    $ map (clamp2D (bounds graph)) nbrslist
+    where 
+    nbrslist = [(vx - 1, vy), (vx + 1, vy),
+                (vx, vy - 1), (vx, vy + 1)]
+    liftFilter :: (Int, Int) -> Bool
+    liftFilter nbr = fltr vAt nbrAt && nbr /= v -- fix clamping
+        where
+        nbrAt = graph!nbr
+        vAt   = graph!v
+
+data Dijkstra = Dijkstra
+    { _start :: Coord
+    , _end   :: Coord 
+    , _graph :: Graph
+    , _costs :: Arr2D Int
+    } deriving (Show)
+
+type DijkPQ = PQ.PQueue Int Coord
+
+dijkstra :: (Coord -> Bool) -> (Node -> Node -> Bool) -> Dijkstra -> Int
+dijkstra endCond adjCond info = dijk' info $ PQ.singleton 0 $ _start info
+    where
+    dijk' :: Dijkstra -> DijkPQ -> Int
+    dijk' d@(Dijkstra _ _ graph costs) pq = case PQ.minViewWithKey pq of
+        Nothing            -> error "Unreachable"
+        Just ((cost, coord), pq')
+            | endCond coord -> costs!coord
+            | otherwise     -> dijk' d {_costs = recurCosts} recurPQ
+            where
+            (recurCosts, recurPQ) = updateCosts (neighbours graph coord adjCond) costs pq'
+            newCost = cost + 1
+            updateCosts :: [Coord] -> Arr2D Int -> DijkPQ -> (Arr2D Int, DijkPQ)
+            updateCosts [] c p      = (c, p)
+            updateCosts (n : nbrs) c p
+                | newCost < costs!n = updateCosts nbrs (c // [(n, newCost)]) (PQ.insert newCost n p)
+                | otherwise         = updateCosts nbrs c p
+

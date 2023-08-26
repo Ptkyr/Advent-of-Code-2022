@@ -9,7 +9,6 @@ main = do
             print $ partOne input
             print $ partTwo input
 
-type Coord = (Int, Int)
 type Snake = [Coord]
 type Stepper = Coord -> Coord
 type Move = (Stepper, Int)
