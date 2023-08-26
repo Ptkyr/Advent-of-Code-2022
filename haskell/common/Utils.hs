@@ -30,6 +30,7 @@ import Data.Ord (clamp)
 import Data.Either
 import qualified Data.PriorityQueue.FingerTree as PQ
 
+-- Misc util
 clamp2D :: ((Int, Int), (Int, Int)) -> (Int, Int) -> (Int, Int)
 clamp2D ((x, y), (x', y')) (a, b) = (clamp (x, x') a, clamp (y, y') b)
 
@@ -102,6 +103,14 @@ listArr2D0 f arr = listArray ((0, 0), (x - 1, y - 1))
 type Coord = (Int, Int)
 type Graph = Arr2D Node
 type Node  = Char
+type DijkPQ = PQ.PQueue Int Coord
+
+data Dijkstra = Dijkstra
+    { _start :: Coord
+    , _end   :: Coord 
+    , _graph :: Graph
+    , _costs :: Arr2D Int
+    } deriving (Show)
 
 neighbours :: Graph -> Coord -> (Node -> Node -> Bool) -> [Coord]
 neighbours graph v@(vx, vy) fltr 
@@ -116,15 +125,6 @@ neighbours graph v@(vx, vy) fltr
         nbrAt = graph!nbr
         vAt   = graph!v
 
-data Dijkstra = Dijkstra
-    { _start :: Coord
-    , _end   :: Coord 
-    , _graph :: Graph
-    , _costs :: Arr2D Int
-    } deriving (Show)
-
-type DijkPQ = PQ.PQueue Int Coord
-
 dijkstra :: (Coord -> Bool) -> (Node -> Node -> Bool) -> Dijkstra -> Int
 dijkstra endCond adjCond info = dijk' info $ PQ.singleton 0 $ _start info
     where
@@ -136,10 +136,9 @@ dijkstra endCond adjCond info = dijk' info $ PQ.singleton 0 $ _start info
             | otherwise     -> dijk' d {_costs = recurCosts} recurPQ
             where
             (recurCosts, recurPQ) = updateCosts (neighbours graph coord adjCond) costs pq'
-            newCost = cost + 1
+            newCost               = cost + 1
             updateCosts :: [Coord] -> Arr2D Int -> DijkPQ -> (Arr2D Int, DijkPQ)
             updateCosts [] c p      = (c, p)
             updateCosts (n : nbrs) c p
                 | newCost < costs!n = updateCosts nbrs (c // [(n, newCost)]) (PQ.insert newCost n p)
                 | otherwise         = updateCosts nbrs c p
-
