@@ -10,7 +10,7 @@ main = do
             print $ partTwo input
 
 partOne :: Dijkstra -> Int
-partOne d = dijkstra (\x -> x == _end d) p1Adj d
+partOne d = dijkstra (== _end d) p1Adj d
     where
     p1Adj :: Node -> Node -> Bool
     p1Adj center nbr = fromEnum center - fromEnum nbr >= -1
