@@ -25,12 +25,11 @@ aocParse :: Parser Dijkstra
 aocParse = do
     grid <- some letterChar `endBy` newline <* eof
     let graph = listArr2D1 id grid
-    let lst = assocs graph
-    let startIdx = start lst
-    let endIdx = end lst
-    let costs = listArray (bounds graph) (repeat maxBound)
-    pure $ Dijkstra startIdx endIdx (graph // [(startIdx, 'a'), (endIdx, 'z')])
-         $ costs // [(startIdx, 0)]
+    let lst   = assocs graph
+    let idxS  = start lst
+    let idxE  = end lst
+    pure $ Dijkstra idxS idxE (graph // [(idxS, 'a'), (idxE, 'z')])
+         $ listArray (bounds graph) (repeat maxBound)
     where
     start :: [(Coord, Node)] -> Coord
     start = fst . head . filter (\n -> snd n == 'S')

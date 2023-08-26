@@ -126,7 +126,9 @@ neighbours graph v@(vx, vy) fltr
         vAt   = graph!v
 
 dijkstra :: (Coord -> Bool) -> (Node -> Node -> Bool) -> Dijkstra -> Int
-dijkstra endCond adjCond info = dijk' info $ PQ.singleton 0 $ _start info
+dijkstra endCond adjCond info@(Dijkstra s e _ c) 
+    = dijk' info {_costs = c // [(s, 0)]} 
+    $ PQ.singleton 0 s
     where
     dijk' :: Dijkstra -> DijkPQ -> Int
     dijk' d@(Dijkstra _ _ graph costs) pq = case PQ.minViewWithKey pq of
@@ -138,7 +140,8 @@ dijkstra endCond adjCond info = dijk' info $ PQ.singleton 0 $ _start info
             (recurCosts, recurPQ) = updateCosts (neighbours graph coord adjCond) costs pq'
             newCost               = cost + 1
             updateCosts :: [Coord] -> Arr2D Int -> DijkPQ -> (Arr2D Int, DijkPQ)
-            updateCosts [] c p      = (c, p)
-            updateCosts (n : nbrs) c p
-                | newCost < costs!n = updateCosts nbrs (c // [(n, newCost)]) (PQ.insert newCost n p)
-                | otherwise         = updateCosts nbrs c p
+            updateCosts [] oldC oldPQ = (oldC, oldPQ)
+            updateCosts (n : nbrs) oldC oldPQ
+                | newCost < costs!n   = updateCosts nbrs (oldC // [(n, newCost)]) 
+                                      $ PQ.insert newCost n oldPQ
+                | otherwise           = updateCosts nbrs oldC oldPQ
