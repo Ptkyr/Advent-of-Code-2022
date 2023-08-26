@@ -83,13 +83,13 @@ listArr2D1 :: (a -> b) -> [[a]] -> Arr2D b
 listArr2D1 f arr = listArray ((1, 1), (x, y)) 
                  $ concat $ map (map f) arr
     where
-    x = length arr
-    y = length $ head arr
+    x = length $ head arr
+    y = length arr
 
 -- Construct a (0, 0)-indexed 2D array
 listArr2D0 :: (a -> b) -> [[a]] -> Arr2D b
 listArr2D0 f arr = listArray ((0, 0), (x - 1, y - 1))
                  $ concat $ map (map f) arr
     where
-    x = length arr
-    y = length $ head arr
+    x = length $ head arr
+    y = length arr
