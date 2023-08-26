@@ -39,8 +39,7 @@ aocParse :: Parser Info
 aocParse = do
     crates <- foldl' (zipWith (++)) (repeat []) <$> parseCrates
     void space1 <* some (lexeme nat) -- eat the 1 2 ... 9
-    moves  <- some parseMove <* eof
-    pure (listArray (1, length crates) crates, moves)
+    (listArr1 crates, ) <$> some parseMove <* eof
     where
     parseCrates :: Parser [[Crates]]
     parseCrates = do

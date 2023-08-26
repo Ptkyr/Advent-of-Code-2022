@@ -80,5 +80,4 @@ oneMonkey = do
 
 aocParse :: Parser (Arr Monkey)
 aocParse = do
-    mlst <- some oneMonkey <* eof
-    pure $ listArray (0, length mlst - 1) mlst
+    listArr0 <$> some oneMonkey <* eof

@@ -10,7 +10,7 @@ main = do
             print $ partTwo input
 
 partOne :: Arr2D Int -> Int
-partOne a = sum $ foldr (zipWithArr (ior)) u [l, d, r]
+partOne a = sum $ foldr (zipWithArr2D (ior)) u [l, d, r]
     where
     ior :: Int -> Int -> Int
     ior x y = clamp (0, 1) $ x + y
@@ -20,7 +20,7 @@ partOne a = sum $ foldr (zipWithArr (ior)) u [l, d, r]
     r = visDir id (+ 1)    a
 
 partTwo :: Arr2D Int -> Int
-partTwo a = maximum $ foldr (zipWithArr (*)) u [l, d, r]
+partTwo a = maximum $ foldr (zipWithArr2D (*)) u [l, d, r]
     where
     u = viewDist (+ (-1)) id a
     l = viewDist id (+ (-1)) a
@@ -52,7 +52,4 @@ viewDist = valueAt 0 1 (+)
 
 aocParse :: Parser (Arr2D Int)
 aocParse = do
-    arr <- some digitChar `endBy` newline <* eof
-    let x = length arr
-    let y = length $ head arr
-    pure $ listArray ((1, 1), (x, y)) $ concat $ map (map digitToInt) arr
+    listArr2D1 digitToInt <$> some digitChar `endBy` newline <* eof
