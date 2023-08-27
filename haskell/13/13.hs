@@ -20,8 +20,8 @@ instance (Ord a) => Ord (Packet a) where
     compare (Some []) (Some (_ : _)) = LT
     compare (Some (_ : _)) (Some []) = GT
     compare (Some (x : xs)) (Some (y : ys)) 
-        | res == EQ              = compare (Some xs) (Some ys)
-        | otherwise              = res
+        | res == EQ                  = compare (Some xs) (Some ys)
+        | otherwise                  = res
         where res = compare x y
 
 type Pint = Packet Int
