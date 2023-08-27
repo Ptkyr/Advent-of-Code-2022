@@ -109,7 +109,7 @@ listArr2D0 f arr = listArray ((0, 0), (x - 1, y - 1))
 indexByValue :: (Ix i, Eq e) => e -> Array i e -> i
 indexByValue val = fst 
                  . head 
-                 . filter (\a -> snd a == val)
+                 . dropWhile (\a -> snd a /= val)
                  . assocs
 
 -- Dijkstra's
