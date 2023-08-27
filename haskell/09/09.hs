@@ -53,14 +53,12 @@ follow (x, y) (hx, hy)
     step = clamp (-1, 1)
 
 aocParse :: Parser [Move]
-aocParse = do
-    some parseMove <* eof
+aocParse = some parseMove <* eof
     where
     parseMove :: Parser Move
-    parseMove = do
-        ( , ) <$> choice
-            [ lexeme "U" *> (pure $ \(x, y) -> (x, y + 1))
-            , lexeme "D" *> (pure $ \(x, y) -> (x, y - 1))
-            , lexeme "L" *> (pure $ \(x, y) -> (x - 1, y))
-            , lexeme "R" *> (pure $ \(x, y) -> (x + 1, y))
-            ] <*> nat
+    parseMove = ( , ) <$> choice
+              [ lexeme "U" *> (pure $ \(x, y) -> (x, y + 1))
+              , lexeme "D" *> (pure $ \(x, y) -> (x, y - 1))
+              , lexeme "L" *> (pure $ \(x, y) -> (x - 1, y))
+              , lexeme "R" *> (pure $ \(x, y) -> (x + 1, y))
+              ] <*> nat

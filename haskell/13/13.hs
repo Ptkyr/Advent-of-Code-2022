@@ -42,11 +42,9 @@ partTwo ap = (indexByValue div2 arr) * (indexByValue div6 arr)
     arr = listArr1 . sort $ [div2, div6] ++ ap
 
 aocParse :: Parser [Pint]
-aocParse = do
-    some parsePacket <* eof
+aocParse = some parsePacket <* eof
     where
     parsePacket :: Parser Pint
-    parsePacket = do
-        Some <$> brackets (oneElem `sepBy` char ',')
+    parsePacket = Some <$> brackets (oneElem `sepBy` char ',')
     oneElem :: Parser Pint
     oneElem = Igr <$> lexeme nat <|> parsePacket

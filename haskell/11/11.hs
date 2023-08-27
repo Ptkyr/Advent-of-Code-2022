@@ -48,8 +48,7 @@ doInspection trunc am i = case am!i of
 
 -- All parsing from here
 parseItems :: Parser [Int]
-parseItems = do
-    lexeme "Starting items:" *> nat `sepBy` lexeme ","
+parseItems = lexeme "Starting items:" *> nat `sepBy` lexeme ","
 
 parseOper :: Parser (Int -> Int)
 parseOper = do
@@ -63,10 +62,9 @@ parseOper = do
                     else (*) num
 
 parseTester :: Parser (Int -> Int)
-parseTester = do
-    makeTest <$> (lexeme "Test: divisible by"        *> nat)
-             <*> (lexeme "If true: throw to monkey"  *> nat)
-             <*> (lexeme "If false: throw to monkey" *> nat)
+parseTester = makeTest <$> (lexeme "Test: divisible by"        *> nat)
+                       <*> (lexeme "If true: throw to monkey"  *> nat)
+                       <*> (lexeme "If false: throw to monkey" *> nat)
     where 
     makeTest :: Int -> Int -> Int -> Int -> Int
     makeTest m t f x
@@ -79,5 +77,4 @@ oneMonkey = do
     Monkey 0 <$> parseItems <*> parseOper <*> parseTester
 
 aocParse :: Parser (Arr Monkey)
-aocParse = do
-    listArr0 <$> some oneMonkey <* eof
+aocParse = listArr0 <$> some oneMonkey <* eof

@@ -23,5 +23,4 @@ uniq c x str@(_ : ss)
     where u = length . group . sort $ take c str
 
 aocParse :: Parser String
-aocParse = do
-    some letterChar <* newline <* eof
+aocParse = some letterChar <* newline <* eof

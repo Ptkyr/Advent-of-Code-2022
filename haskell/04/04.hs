@@ -30,10 +30,9 @@ partTwo = sum . map overlaps
         | otherwise            = 0
 
 aocParse :: Parser [LinePair]
-aocParse = do
-    some parseLinePair <* eof
+aocParse = some parseLinePair <* eof
     where
     parseLinePair :: Parser LinePair
-    parseLinePair = do
-        (, , ,) <$> nat <*> (lexeme "-" *> nat)
-                <*> (lexeme "," *> nat) <*> (lexeme "-" *> nat)
+    parseLinePair = (, , ,) 
+                  <$> nat <*> (lexeme "-" *> nat)
+                  <*> (lexeme "," *> nat) <*> (lexeme "-" *> nat)

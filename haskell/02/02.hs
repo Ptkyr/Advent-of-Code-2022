@@ -25,8 +25,7 @@ partTwo = sum . map toScore
     toScore (f, m) = (f + m - 1) `mod` 3 + m * 3 + 1
 
 aocParse :: Parser [RPS]
-aocParse = do
-    some oneRPS <* eof
+aocParse = some oneRPS <* eof
     where
     oneRPS :: Parser RPS
     oneRPS = do 
