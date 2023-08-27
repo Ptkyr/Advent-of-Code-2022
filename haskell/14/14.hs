@@ -19,11 +19,14 @@ partOne = dropSand p1End 0
     p1End (_, y) cave = y == ayMax cave - 1 -- fallen into abyss
 
 partTwo :: Cave -> Int
-partTwo cave = leftTri + rightTri + dropSand p2End 1 cave
+partTwo cave = leftTri 
+             + rightTri 
+             + dropSand p2End 1 cave -- why 1? Idk
     where
-    ((x1, _), (x2, y2)) = bounds cave
-    leftTri  = nthTri $ y2 - 500 + x1 -- faster to compute
-    rightTri = nthTri $ 500 + y2 - x2 --  trivially filled
+    ((x, _), (x', y')) = bounds cave
+    -- Compute the trivially filled spillover by the sides
+    leftTri  = nthTri $ y' - 500 + x
+    rightTri = nthTri $ 500 + y' - x'
     p2End :: Coord -> Cave -> Bool
     p2End cur cave' = cave'!cur
 
