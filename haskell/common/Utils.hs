@@ -37,10 +37,10 @@ type Coord = (Int, Int)
 
 -- Misc util
 add1 :: Int -> Int
-add1 = (+) 1
+add1 = flip (+) 1
 
 sub1 :: Int -> Int
-sub1 = (+) (-1)
+sub1 = flip (+) (-1)
 
 clamp2D :: ((Int, Int), (Int, Int)) -> (Int, Int) -> (Int, Int)
 clamp2D ((x, y), (x', y')) (a, b) = (clamp (x, x') a, clamp (y, y') b)

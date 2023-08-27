@@ -16,14 +16,14 @@ partOne :: Cave -> Int
 partOne = dropSand p1End 0
     where
     p1End :: Coord -> Cave -> Bool
-    p1End (_, y) cave = y == ayMax cave - 1
+    p1End (_, y) cave = y == ayMax cave - 1 -- fallen into abyss
 
 partTwo :: Cave -> Int
 partTwo cave = leftTri + rightTri + dropSand p2End 1 cave
     where
     ((x1, _), (x2, y2)) = bounds cave
-    leftTri  = nthTri $ x1 - 500 + y2 - 1
-    rightTri = nthTri $ 500 + y2 - x2 - 1
+    leftTri  = nthTri $ y2 - 500 + x1 - 1 -- faster to compute
+    rightTri = nthTri $ 500 + y2 - x2 - 1 --  trivially filled
     p2End :: Coord -> Cave -> Bool
     p2End cur cave' = cave'!cur
 

@@ -14,18 +14,18 @@ partOne a = sum $ foldl' (zipWithArr2D (ior)) u [l, d, r]
     where
     ior :: Int -> Int -> Int
     ior x y = clamp (0, 1) $ x + y
-    u = visDir (+ (-1)) id a
-    l = visDir id (+ (-1)) a
-    d = visDir (+ 1) id    a
-    r = visDir id (+ 1)    a
+    u = visDir sub1 id a
+    l = visDir id sub1 a
+    d = visDir add1 id a
+    r = visDir id add1 a
 
 partTwo :: Arr2D Int -> Int
 partTwo a = maximum $ foldl' (zipWithArr2D (*)) u [l, d, r]
     where
-    u = viewDist (+ (-1)) id a
-    l = viewDist id (+ (-1)) a
-    d = viewDist (+ 1) id    a
-    r = viewDist id (+ 1)    a
+    u = viewDist sub1 id a
+    l = viewDist id sub1 a
+    d = viewDist add1 id a
+    r = viewDist id add1 a
 
 valueAt :: Int -> Int -> (Int -> Int -> Int)
         -> (Int -> Int) -> (Int -> Int) -> Arr2D Int -> Arr2D Int
