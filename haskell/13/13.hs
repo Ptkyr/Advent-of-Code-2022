@@ -25,26 +25,25 @@ instance (Ord a) => Ord (Packet a) where
         where res = compare x y
 
 type Pint = Packet Int
-type Pair = (Pint, Pint)
 
-partOne :: Arr Pint -> Int
-partOne = sum . map p1Order . assocs . listArr1 . toPairs . elems
+partOne :: [Pint] -> Int
+partOne = sum . map p1Order . assocs . listArr1 . toPairs
     where
-    p1Order :: (Int, Pair) -> Int
+    p1Order :: (Int, (Pint, Pint)) -> Int
     p1Order (x, (p1, p2)) 
         | p1 < p2   = x
         | otherwise = 0
 
-partTwo :: Arr Pint -> Int
+partTwo :: [Pint] -> Int
 partTwo ap = (indexByValue div2 arr) * (indexByValue div6 arr)
     where
     div2 = Some [Some [Igr 2]]
     div6 = Some [Some [Igr 6]]
-    arr = listArr1 . sort . ((++) [div2, div6]) $ elems ap
+    arr = listArr1 . sort $ [div2, div6] ++ ap
 
-aocParse :: Parser (Arr Pint)
+aocParse :: Parser [Pint]
 aocParse = do
-    listArr1 <$> some parsePacket <* eof
+    some parsePacket <* eof
     where
     parsePacket :: Parser Pint
     parsePacket = do
