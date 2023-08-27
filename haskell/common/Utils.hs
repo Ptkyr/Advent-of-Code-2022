@@ -123,6 +123,12 @@ indexByValue val = fst
                  . dropWhile (\a -> snd a /= val)
                  . assocs
 
+ayMax :: Arr2D e -> Int
+ayMax = snd . snd . bounds
+
+axMax :: Arr2D e -> Int
+axMax = fst . snd . bounds
+
 -- Dijkstra's
 type Graph = Arr2D Node
 type Node  = Char
