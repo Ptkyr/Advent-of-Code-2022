@@ -112,10 +112,6 @@ indexByValue val = fst
                  . filter (\a -> snd a == val)
                  . assocs
 
--- lifted map for arrays
-mapArray :: (Ix i) => (a -> b) -> Array i a -> Array i b
-mapArray f arr = listArray (bounds arr) $ map f $ elems arr
-
 -- Dijkstra's
 type Coord = (Int, Int)
 type Graph = Arr2D Node
