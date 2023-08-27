@@ -62,8 +62,8 @@ nthTri :: Int -> Int
 nthTri n = (n * (n + 1)) `div` 2
 
 -- Combinators
-phi :: (b -> b -> c) -> (a -> b) -> a -> a -> c
-phi binary unary a1 a2 = binary (unary a1) (unary a2)
+phi :: (b -> y -> c) -> (a -> b) -> (x -> y) -> a -> x -> c
+phi bin un un' a1 a2 = bin (un a1) (un' a2)
 
 -- Parser util
 type Parser = Parsec Void Text
