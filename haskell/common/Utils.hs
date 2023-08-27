@@ -11,7 +11,7 @@ module Utils
     , module Data.Void
     , Text
     , pack
-    , clamp
+    , module Data.Ord
     ) where
 
 import Text.Megaparsec hiding (parse) -- main module
@@ -26,13 +26,19 @@ import Data.Char
 import Data.List
 import Data.Array
 import Control.Applicative
-import Data.Ord (clamp)
+import Data.Ord
 import Data.Either
 import qualified Data.PriorityQueue.FingerTree as PQ
 
 -- Misc util
 clamp2D :: ((Int, Int), (Int, Int)) -> (Int, Int) -> (Int, Int)
 clamp2D ((x, y), (x', y')) (a, b) = (clamp (x, x') a, clamp (y, y') b)
+
+-- Will drop the last element if odd
+toPairs :: [a] -> [(a, a)]
+toPairs (x : y : zs) = (x, y) : toPairs zs
+toPairs []           = []
+toPairs (z : zs)     = []
 
 -- Parser util
 type Parser = Parsec Void Text
@@ -98,6 +104,17 @@ listArr2D0 f arr = listArray ((0, 0), (x - 1, y - 1))
     where
     x = length arr
     y = length $ head arr
+
+-- WARNING: partial function
+indexByValue :: (Ix i, Eq e) => e -> Array i e -> i
+indexByValue val = fst 
+                 . head 
+                 . filter (\a -> snd a == val)
+                 . assocs
+
+-- lifted map for arrays
+mapArray :: (Ix i) => (a -> b) -> Array i a -> Array i b
+mapArray f arr = listArray (bounds arr) $ map f $ elems arr
 
 -- Dijkstra's
 type Coord = (Int, Int)
