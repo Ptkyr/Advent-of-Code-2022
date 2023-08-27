@@ -28,16 +28,21 @@ type Pint = Packet Int
 type Pair = (Pint, Pint)
 
 partOne :: Arr Pint -> Int
-partOne = sum . map p1Order . assocs . listArr1 . toPairs . elems
+partOne = sum 
+        . map p1Order 
+        . assocs 
+        . listArr1 
+        . toPairs 
+        . elems
     where
     p1Order :: (Int, Pair) -> Int
-    p1Order (x, (p1, p2)) = case compare p1 p2 of
-        LT -> x
-        GT -> 0
-        EQ -> error "Unreachable"
+    p1Order (x, (p1, p2)) 
+        | p1 < p2   = x
+        | otherwise = 0
 
 partTwo :: Arr Pint -> Int
-partTwo ap = (indexByValue div2 arr) * (indexByValue div6 arr)
+partTwo ap = (indexByValue div2 arr) 
+           * (indexByValue div6 arr)
     where
     div2 = Some [Some [Igr 2]]
     div6 = Some [Some [Igr 6]]
