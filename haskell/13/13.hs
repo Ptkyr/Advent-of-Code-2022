@@ -28,12 +28,7 @@ type Pint = Packet Int
 type Pair = (Pint, Pint)
 
 partOne :: Arr Pint -> Int
-partOne = sum 
-        . map p1Order 
-        . assocs 
-        . listArr1 
-        . toPairs 
-        . elems
+partOne = sum . map p1Order . assocs . listArr1 . toPairs . elems
     where
     p1Order :: (Int, Pair) -> Int
     p1Order (x, (p1, p2)) 
@@ -41,15 +36,11 @@ partOne = sum
         | otherwise = 0
 
 partTwo :: Arr Pint -> Int
-partTwo ap = (indexByValue div2 arr) 
-           * (indexByValue div6 arr)
+partTwo ap = (indexByValue div2 arr) * (indexByValue div6 arr)
     where
     div2 = Some [Some [Igr 2]]
     div6 = Some [Some [Igr 6]]
-    arr = listArr1
-        . sort 
-        . ((++) [div2, div6])
-        $ elems ap
+    arr = listArr1 . sort . ((++) [div2, div6]) $ elems ap
 
 aocParse :: Parser (Arr Pint)
 aocParse = do
