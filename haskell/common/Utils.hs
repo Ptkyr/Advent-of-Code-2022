@@ -36,6 +36,12 @@ import Data.List.HT (mapAdjacent)
 type Coord = (Int, Int)
 
 -- Misc util
+add1 :: Int -> Int
+add1 = (+) 1
+
+sub1 :: Int -> Int
+sub1 = (+) (-1)
+
 clamp2D :: ((Int, Int), (Int, Int)) -> (Int, Int) -> (Int, Int)
 clamp2D ((x, y), (x', y')) (a, b) = (clamp (x, x') a, clamp (y, y') b)
 
@@ -51,6 +57,13 @@ fillLine (x, y) (x', y')
     | x == x' = zip (repeat x) [min y y'..max y y']
     | y == y' = zip [min x x'..max x x'] $ repeat y
     | otherwise = error "To-do"
+
+nthTri :: Int -> Int
+nthTri n = (n * (n + 1)) `div` 2
+
+-- Combinators
+phi :: (b -> b -> c) -> (a -> b) -> a -> a -> c
+phi binary unary a1 a2 = binary (unary a1) (unary a2)
 
 -- Parser util
 type Parser = Parsec Void Text
