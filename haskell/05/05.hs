@@ -42,7 +42,7 @@ aocParse = do
     (listArr1 crates, ) <$> some parseMove <* eof
     where
     parseCrates :: Parser [[Crates]]
-    parseCrates = (oneCrate `sepBy` char ' ') `endBy` newline
+    parseCrates = (oneCrate `sepBy1` char ' ') `endBy` newline
     oneCrate :: Parser Crates
     oneCrate = choice
         [ char '[' *> some upperChar <* char ']'

@@ -48,7 +48,7 @@ doInspection trunc am i = case am!i of
 
 -- All parsing from here
 parseItems :: Parser [Int]
-parseItems = lexeme "Starting items:" *> nat `sepBy` lexeme ","
+parseItems = lexeme "Starting items:" *> nat `sepBy1` lexeme ","
 
 parseOper :: Parser (Int -> Int)
 parseOper = do

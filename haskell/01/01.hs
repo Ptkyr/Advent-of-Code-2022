@@ -16,7 +16,7 @@ partTwo :: [Int] -> Int
 partTwo = sum . take 3 . sortBy (flip compare)
 
 aocParse :: Parser [Int]
-aocParse = map sum <$> oneElf `sepBy` newline <* eof
+aocParse = map sum <$> oneElf `sepBy1` newline <* eof
     where
     oneElf :: Parser [Int]
     oneElf = (read <$> some digitChar) `endBy` newline

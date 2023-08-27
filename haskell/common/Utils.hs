@@ -12,6 +12,7 @@ module Utils
     , Text
     , pack
     , module Data.Ord
+    , module Data.List.HT
     ) where
 
 import Text.Megaparsec hiding (parse) -- main module
@@ -29,6 +30,10 @@ import Control.Applicative
 import Data.Ord
 import Data.Either
 import qualified Data.PriorityQueue.FingerTree as PQ
+import Data.List.HT (mapAdjacent)
+
+-- Typedefs
+type Coord = (Int, Int)
 
 -- Misc util
 clamp2D :: ((Int, Int), (Int, Int)) -> (Int, Int) -> (Int, Int)
@@ -40,9 +45,15 @@ toPairs (x : y : zs) = (x, y) : toPairs zs
 toPairs []           = []
 toPairs (z : zs)     = []
 
+-- Generates line segment between two endpoints
+fillLine :: Coord -> Coord -> [Coord]
+fillLine (x, y) (x', y')
+    | x == x' = zip (repeat x) [min y y'..max y y']
+    | y == y' = zip [min x x'..max x x'] $ repeat y
+    | otherwise = error "To-do"
+
 -- Parser util
 type Parser = Parsec Void Text
-
 eatSome :: Parser ()
 eatSome = L.space space1 empty empty
 
@@ -113,7 +124,6 @@ indexByValue val = fst
                  . assocs
 
 -- Dijkstra's
-type Coord = (Int, Int)
 type Graph = Arr2D Node
 type Node  = Char
 type DijkPQ = PQ.PQueue Int Coord
