@@ -22,8 +22,8 @@ partTwo :: Cave -> Int
 partTwo cave = leftTri + rightTri + dropSand p2End 1 cave
     where
     ((x1, _), (x2, y2)) = bounds cave
-    leftTri  = nthTri $ y2 - 500 + x1 - 1 -- faster to compute
-    rightTri = nthTri $ 500 + y2 - x2 - 1 --  trivially filled
+    leftTri  = nthTri $ y2 - 500 + x1 -- faster to compute
+    rightTri = nthTri $ 500 + y2 - x2 --  trivially filled
     p2End :: Coord -> Cave -> Bool
     p2End cur cave' = cave'!cur
 
@@ -38,6 +38,7 @@ dropSand endCnd i curCave = case dropUnit curCave of
         doFall :: Coord -> Cave -> Maybe Cave
         doFall cur@(x, y) cave
             | endCnd cur cave         = Nothing
+            | not $ inRange bnds down = rest
             | not $ cave!down         = doFall down cave
             | not $ inRange bnds dlef = rest
             | not $ cave!dlef         = doFall dlef cave
@@ -57,11 +58,9 @@ aocParse = do
     allRocks <- concat <$> some parseRock <* eof
     let xMin = sub1 $ fst $ minimumBy (phi compare fst) allRocks
     let xMax = add1 $ fst $ maximumBy (phi compare fst) allRocks
-    let yMax = snd $ maximumBy (phi compare snd) allRocks
-    let y'   = yMax + 2
-    let grid = listArray ((xMin, 0), (xMax, y')) (repeat False)
-    let bttm = zip [xMin..xMax] (repeat y')
-    pure $ grid // zip (allRocks ++ bttm) (repeat True)
+    let yMax = add1 $ snd $ maximumBy (phi compare snd) allRocks
+    let grid = listArray ((xMin, 0), (xMax, yMax)) (repeat False)
+    pure $ grid // zip allRocks (repeat True)
     where
     parseRock :: Parser Rock
     parseRock = nub
