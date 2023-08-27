@@ -44,12 +44,11 @@ aocParse = do
     parseCrates :: Parser [[Crates]]
     parseCrates = do
         (oneCrate `sepBy` char ' ') `endBy` newline
-        where
-        oneCrate :: Parser Crates
-        oneCrate = choice
-            [ char '[' *> some upperChar <* char ']'
-            , string "   " *> (pure []) -- for the ++ later
-            ]
+    oneCrate :: Parser Crates
+    oneCrate = choice
+        [ char '[' *> some upperChar <* char ']'
+        , string "   " *> (pure []) -- for the ++ later
+        ]
     parseMove :: Parser Move
     parseMove = do
         Move <$> (lexeme "move" *> nat)

@@ -48,6 +48,5 @@ aocParse = do
     parsePacket :: Parser Pint
     parsePacket = do
         Some <$> brackets (oneElem `sepBy` char ',')
-        where
-        oneElem :: Parser Pint
-        oneElem = Igr <$> lexeme nat <|> parsePacket
+    oneElem :: Parser Pint
+    oneElem = Igr <$> lexeme nat <|> parsePacket

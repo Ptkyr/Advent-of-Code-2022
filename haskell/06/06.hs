@@ -20,8 +20,7 @@ uniq _ _ [] = 0
 uniq c x str@(_ : ss)
     | u == c    = x 
     | otherwise = uniq c (x + 1) ss
-    where 
-    u = length . group . sort $ take c str
+    where u = length . group . sort $ take c str
 
 aocParse :: Parser String
 aocParse = do

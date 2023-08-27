@@ -41,12 +41,11 @@ aocParse = do
     parseRuck :: Parser Rucksack
     parseRuck = do
         map priority <$> some letterChar
+    priority :: Char -> Int
+    priority c
+        | c >= 'A' && c <= 'Z' = c' - intA + 27
+        | otherwise            = c' - inta + 1
         where
-        priority :: Char -> Int
-        priority c
-            | c >= 'A' && c <= 'Z' = c' - intA + 27
-            | otherwise            = c' - inta + 1
-            where
-            c'   = fromEnum c
-            inta = fromEnum 'a' 
-            intA = fromEnum 'A'
+        c'   = fromEnum c
+        inta = fromEnum 'a' 
+        intA = fromEnum 'A'
