@@ -21,36 +21,6 @@ data Dir = Dir
 rootDir :: Dir
 rootDir = Dir 0 "/" [] Nothing
 
-aocParse :: Parser Dir
-aocParse = lexeme "$ cd /" *> parseDir rootDir
-    where
-    parseDir :: Dir -> Parser Dir
-    parseDir dir = choice
-        [ lexeme "$ ls"    *> parseDir dir
-        , lexeme "$ cd .." *> parseDir (unroll p)
-        , lexeme "$ cd" *> lexword
-                           *> parseDir (Dir 0 "" [] $ Just dir)
-        , lexeme "dir" *> lexword 
-                           *> parseDir dir
-        , do 
-            i <- nat 
-            void fName     *> parseDir dir {_size = _size dir + i}
-        , eof *> case _name dir of
-            "/"            -> pure $ dir
-            _              -> parseDir (unroll p)
-        ]
-        where 
-        p    = _prnt dir
-        newf = dir {_prnt = Nothing}
-        -- unroll; after making a dir, insert into parent
-        unroll :: Maybe Dir -> Dir
-        unroll Nothing  = error "Unreachable"
-        unroll (Just d) = newdir
-            where newdir = d {_subs = newf : _subs d
-                             ,_size = _size newf + _size d}
-        fName :: Parser String
-        fName = lexeme (some $ letterChar <|> char '.')
-
 partOne :: Dir -> Int
 partOne f = isSmall f + (sum . map partOne $ _subs f)
     where 
@@ -70,3 +40,35 @@ partTwo rt = p2FixT (gtmin sizeTarget) rt
     gtmin t x y = case sort $ filter (> t) [x, y] of
         m : _ -> m
         []    -> 0
+
+aocParse :: Parser Dir
+aocParse = lexeme "$ cd /" *> parseDir rootDir
+    where
+    parseDir :: Dir -> Parser Dir
+    parseDir dir = choice
+        [ lexeme "$ ls"    *> skip
+        , lexeme "$ cd .." *> back
+        , lexeme "$ cd" *> lexword
+                           *> parseDir (Dir 0 "" [] $ Just dir)
+        , lexeme "dir" *> lexword 
+                           *> skip
+        , do 
+            i <- nat 
+            void fName     *> parseDir dir {_size = _size dir + i}
+        , eof *> case _name dir of
+            "/"            -> pure $ dir
+            _              -> back
+        ]
+        where 
+        skip = parseDir dir
+        back = parseDir $ unroll p
+        p    = _prnt dir
+        newf = dir {_prnt = Nothing}
+        -- unroll; after making a dir, insert into parent
+        unroll :: Maybe Dir -> Dir
+        unroll Nothing  = error "Unreachable"
+        unroll (Just d) = newdir
+            where newdir = d {_subs = newf : _subs d
+                             ,_size = _size newf + _size d}
+        fName :: Parser String
+        fName = lexeme (some $ letterChar <|> char '.')
