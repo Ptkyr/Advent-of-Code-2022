@@ -18,9 +18,6 @@ data Dir = Dir
     , _prnt :: Maybe Dir
     }
 
-rootDir :: Dir
-rootDir = Dir 0 "/" [] Nothing
-
 partOne :: Dir -> Int
 partOne f = isSmall f + (sum . map partOne $ _subs f)
     where 
@@ -42,7 +39,7 @@ partTwo rt = p2FixT (gtmin sizeTarget) rt
         []    -> 0
 
 aocParse :: Parser Dir
-aocParse = lexeme "$ cd /" *> parseDir rootDir
+aocParse = lexeme "$ cd /" *> parseDir (Dir 0 "/" [] Nothing)
     where
     parseDir :: Dir -> Parser Dir
     parseDir dir = choice
