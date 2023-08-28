@@ -26,7 +26,7 @@ partTwo cave = leftTri
     ((x, _), (x', y')) = bounds cave
     -- Compute the trivially filled spillover by the sides
     leftTri  = nthTri $ y' - 500 + x
-    rightTri = nthTri $ 500 + y' - x'
+    rightTri = nthTri $ y' - x' + 500
     p2End :: Coord -> Cave -> Bool
     p2End cur cave' = cave'!cur
 
@@ -58,9 +58,10 @@ dropSand endCnd i curCave = case dropUnit curCave of
 aocParse :: Parser Cave
 aocParse = do
     allRocks <- concat <$> some parseRock <* eof
-    let xMin = sub1 . fst $ minimumBy (compare `on` fst) allRocks
-    let xMax = add1 . fst $ maximumBy (compare `on` fst) allRocks
-    let yMax = add1 . snd $ maximumBy (compare `on` snd) allRocks
+    let xRks = map fst allRocks
+    let xMin = sub1 $ minimum xRks
+    let xMax = add1 $ maximum xRks
+    let yMax = add1 . maximum $ map snd allRocks
     let grid = listArray ((xMin, 0), (xMax, yMax)) $ repeat False
     pure $ grid // zip allRocks (repeat True)
     where

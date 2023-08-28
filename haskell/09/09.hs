@@ -44,11 +44,11 @@ slither (hd : tl : r) = hd : slither (follow tl hd : r)
 slither end           = end
 
 follow :: Coord -> Coord -> Coord
-follow (x, y) (hx, hy)
-    | abs dx < 2 && abs dy < 2 = (x, y) -- Only move when necessary
-    | otherwise                = (x + step dx, y + step dy)
+follow tl hd
+    | abs dx < 2 && abs dy < 2 = tl -- Only move when necessary
+    | otherwise                = liftT2 (+) tl $ liftT1 step delta
     where
-    (dx, dy) = (hx - x, hy - y)
+    delta@(dx, dy) = liftT2 (-) hd tl
     step :: Int -> Int
     step = clamp (-1, 1)
 

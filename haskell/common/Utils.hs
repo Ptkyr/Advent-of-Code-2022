@@ -67,6 +67,15 @@ nthTri n = (n * (n + 1)) `div` 2
 phi :: (b -> y -> c) -> (a -> b) -> (x -> y) -> a -> x -> c
 phi bin un un' a1 a2 = bin (un a1) (un' a2)
 
+b1 :: (c -> d) -> (a -> b -> c) -> a -> b -> d
+b1 un bin x y = un $ bin x y
+
+liftT1 :: (a -> b) -> (a, a) -> (b, b)
+liftT1 f (x, y) = (f x, f y)
+
+liftT2 :: (a -> a -> b) -> (a, a) -> (a, a) -> (b, b)
+liftT2 f a b = (on f fst a b, on f snd a b)
+
 -- Parser util
 type Parser = Parsec Void Text
 eatSome :: Parser ()
