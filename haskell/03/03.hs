@@ -38,7 +38,7 @@ aocParse :: Parser [Rucksack]
 aocParse = parseRuck `endBy` newline <* eof
     where
     parseRuck :: Parser Rucksack
-    parseRuck = some $ priority <$> letterChar
+    parseRuck = map priority <$> word
     priority :: Char -> Int
     priority c
         | c >= 'A' && c <= 'Z' = c' - intA + 27

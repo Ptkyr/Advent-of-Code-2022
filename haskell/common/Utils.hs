@@ -108,7 +108,10 @@ braces :: Parser a -> Parser a
 braces = between (symbol "{") (symbol "}")
 
 word :: Parser String
-word = lexeme $ some letterChar
+word = some letterChar
+
+lexword :: Parser String
+lexword = lexeme $ some letterChar
 
 parseInput :: Parser a -> String -> IO (Either (ParseErrorBundle Text Void) a)
 parseInput parser file = runParser parser file . pack <$> readFile file

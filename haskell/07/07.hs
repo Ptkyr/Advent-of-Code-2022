@@ -28,9 +28,9 @@ aocParse = lexeme "$ cd /" *> parseDir rootDir
     parseDir dir = choice
         [ lexeme "$ ls"    *> parseDir dir
         , lexeme "$ cd .." *> parseDir (unroll p)
-        , lexeme "$ cd" *> word
+        , lexeme "$ cd" *> lexword
                            *> parseDir (Dir 0 "" [] $ Just dir)
-        , lexeme "dir" *> word 
+        , lexeme "dir" *> lexword 
                            *> parseDir dir
         , do 
             i <- nat 
