@@ -63,8 +63,8 @@ aocParse = do
     network <- some parseSensor <* eof
     let sensors = map (fst . _sensor) network
     let beacons = map (fst . _beacon) network
-    let xmin = min (minimum sensors) (minimum beacons)
-    let xmax = max (maximum sensors) (maximum beacons)
+    let xmin = on min minimum sensors beacons
+    let xmax = on max maximum sensors beacons
     let rmax = maximum $ map _range network
     pure $ Network network (xmin - rmax) (xmax + rmax)
     where
