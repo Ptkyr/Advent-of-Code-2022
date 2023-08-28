@@ -59,10 +59,9 @@ partOne f = isSmall f + (sum . map partOne $ _subs f)
         where x = _size t
         
 partTwo :: Dir -> Int
-partTwo rt = p2FixT (gtmin p2min) rt
+partTwo rt = p2FixT (gtmin sizeTarget) rt
     where
-    p2min :: Int
-    p2min = 30000000 - 70000000 + _size rt
+    sizeTarget = 30000000 - 70000000 + _size rt
     p2FixT :: (Int -> Int -> Int) -> Dir -> Int
     -- Order moot, but foldl' is faster
     p2FixT m f = foldl' m (_size f) $ map (p2FixT m) $ _subs f
