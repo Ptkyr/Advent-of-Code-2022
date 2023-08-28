@@ -13,6 +13,7 @@ module Utils
     , pack
     , module Data.Ord
     , module Data.List.HT
+    , module Data.Function
     ) where
 
 import Text.Megaparsec hiding (parse) -- main module
@@ -31,6 +32,7 @@ import Data.Ord
 import Data.Either
 import qualified Data.PriorityQueue.FingerTree as PQ
 import Data.List.HT (mapAdjacent)
+import Data.Function
 
 -- Typedefs
 type Coord = (Int, Int)
