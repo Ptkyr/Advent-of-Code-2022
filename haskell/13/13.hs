@@ -47,4 +47,4 @@ aocParse = some parsePacket <* eof
     parsePacket :: Parser Pint
     parsePacket = Some <$> brackets (oneElem `sepBy` char ',')
     oneElem :: Parser Pint
-    oneElem = Igr <$> lexeme nat <|> parsePacket
+    oneElem = Igr <$> nat <|> parsePacket

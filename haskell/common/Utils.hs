@@ -1,19 +1,19 @@
 module Utils 
     ( module Utils
+    , module Data.Void
     , module Data.Array
     , module Data.Char
     , module Data.List
     , module Text.Megaparsec 
     , module Text.Megaparsec.Char
     , module Text.Megaparsec.Debug
-    , readMaybe
-    , void
-    , module Data.Void
-    , Text
-    , pack
     , module Data.Ord
     , module Data.List.HT
     , module Data.Function
+    , readMaybe
+    , void
+    , Text
+    , pack
     , amap
     ) where
 
@@ -28,7 +28,7 @@ import Data.Text (Text, pack)
 import Data.Char
 import Data.List
 import Data.Array
-import Control.Applicative
+import Control.Applicative hiding (some)
 import Data.Ord
 import Data.Either
 import qualified Data.PriorityQueue.FingerTree as PQ
@@ -106,6 +106,9 @@ parens = between (symbol "(") (symbol ")")
 
 braces :: Parser a -> Parser a
 braces = between (symbol "{") (symbol "}")
+
+word :: Parser String
+word = lexeme $ some letterChar
 
 parseInput :: Parser a -> String -> IO (Either (ParseErrorBundle Text Void) a)
 parseInput parser file = runParser parser file . pack <$> readFile file

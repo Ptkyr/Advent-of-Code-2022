@@ -71,5 +71,5 @@ aocParse = do
               . mapAdjacent fillLine 
               <$> parseCoord `sepBy1` lexeme "->"
     parseCoord :: Parser Coord
-    parseCoord = (, ) <$> (lexeme nat <* lexeme ",")
-                      <*> lexeme nat
+    parseCoord = (, ) <$> nat <* lexeme ","
+                      <*> nat

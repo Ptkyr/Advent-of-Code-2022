@@ -28,16 +28,16 @@ aocParse = lexeme "$ cd /" *> parseDir rootDir
     parseDir dir = choice
         [ lexeme "$ ls"    *> parseDir dir
         , lexeme "$ cd .." *> parseDir (unroll p)
-        , lexeme "$ cd"    *> lexeme (some lowerChar) 
+        , lexeme "$ cd" *> word
                            *> parseDir (Dir 0 "" [] $ Just dir)
-        , lexeme "dir"     *> lexeme (some lowerChar) 
+        , lexeme "dir" *> word 
                            *> parseDir dir
         , do 
-            i <- lexeme nat <* lexeme (some (lowerChar <|> char '.'))
-            parseDir dir {_size = i + _size dir}
+            i <- nat 
+            void fName     *> parseDir dir {_size = _size dir + i}
         , eof *> case _name dir of
-            "/" -> pure $ dir
-            _   -> parseDir (unroll p)
+            "/"            -> pure $ dir
+            _              -> parseDir (unroll p)
         ]
         where 
         p    = _prnt dir
@@ -48,6 +48,8 @@ aocParse = lexeme "$ cd /" *> parseDir rootDir
         unroll (Just d) = newdir
             where newdir = d {_subs = newf : _subs d
                              ,_size = _size newf + _size d}
+        fName :: Parser String
+        fName = lexeme (some $ letterChar <|> char '.')
 
 partOne :: Dir -> Int
 partOne f = isSmall f + (sum . map partOne $ _subs f)
@@ -56,12 +58,11 @@ partOne f = isSmall f + (sum . map partOne $ _subs f)
     isSmall t = if x <= 100000 then x else 0
         where x = _size t
         
-p2min :: Dir -> Int
-p2min rt = 30000000 - 70000000 + _size rt
-
 partTwo :: Dir -> Int
-partTwo rt = p2FixT (gtmin $ p2min rt) rt
+partTwo rt = p2FixT (gtmin p2min) rt
     where
+    p2min :: Int
+    p2min = 30000000 - 70000000 + _size rt
     p2FixT :: (Int -> Int -> Int) -> Dir -> Int
     -- Order moot, but foldl' is faster
     p2FixT m f = foldl' m (_size f) $ map (p2FixT m) $ _subs f
