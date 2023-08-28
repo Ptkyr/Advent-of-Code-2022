@@ -37,24 +37,23 @@ dropSand endCnd i curCave = case dropUnit curCave of
     where
     dropUnit :: Cave -> Maybe Cave
     dropUnit = doFall (500, 0)
+    doFall :: Coord -> Cave -> Maybe Cave
+    doFall cur@(x, y) cave
+        | endCnd cur cave         = Nothing
+        | not $ inRange bnds down = rest
+        | not $ cave!down         = doFall down cave
+        | not $ inRange bnds dlef = rest
+        | not $ cave!dlef         = doFall dlef cave
+        | not $ inRange bnds drit = rest 
+        | not $ cave!drit         = doFall drit cave
+        | otherwise               = rest
         where
-        doFall :: Coord -> Cave -> Maybe Cave
-        doFall cur@(x, y) cave
-            | endCnd cur cave         = Nothing
-            | not $ inRange bnds down = rest
-            | not $ cave!down         = doFall down cave
-            | not $ inRange bnds dlef = rest
-            | not $ cave!dlef         = doFall dlef cave
-            | not $ inRange bnds drit = rest 
-            | not $ cave!drit         = doFall drit cave
-            | otherwise               = rest
-            where
-            bnds = bounds cave
-            y'   = y + 1
-            down = (x, y')
-            dlef = (x - 1, y')
-            drit = (x + 1, y')
-            rest = Just $ cave // [(cur, True)]
+        bnds = bounds cave
+        y'   = y + 1
+        down = (x, y')
+        dlef = (x - 1, y')
+        drit = (x + 1, y')
+        rest = Just $ cave // [(cur, True)]
 
 aocParse :: Parser Cave
 aocParse = do

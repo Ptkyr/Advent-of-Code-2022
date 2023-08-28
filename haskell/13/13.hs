@@ -39,7 +39,7 @@ partTwo ap = (indexByValue div2 arr) * (indexByValue div6 arr)
     where
     div2 = Some [Some [Igr 2]]
     div6 = Some [Some [Igr 6]]
-    arr = listArr1 . sort $ [div2, div6] ++ ap
+    arr  = listArr1 . sort $ [div2, div6] ++ ap
 
 aocParse :: Parser [Pint]
 aocParse = some parsePacket <* eof
