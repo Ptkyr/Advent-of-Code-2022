@@ -14,10 +14,11 @@ module Utils
     , module Data.Ord
     , module Data.List.HT
     , module Data.Function
+    , amap
     ) where
 
-import Text.Megaparsec hiding (parse) -- main module
-import Text.Megaparsec.Char -- common combinators for character streams
+import Text.Megaparsec hiding (parse)
+import Text.Megaparsec.Char
 import qualified Text.Megaparsec.Char.Lexer as L
 import Text.Megaparsec.Debug
 import Text.Read (readMaybe)
@@ -33,6 +34,7 @@ import Data.Either
 import qualified Data.PriorityQueue.FingerTree as PQ
 import Data.List.HT (mapAdjacent)
 import Data.Function
+import GHC.Arr (amap)
 
 -- Typedefs
 type Coord = (Int, Int)
@@ -125,17 +127,17 @@ listArr0 :: [a] -> Arr a
 listArr0 arr = listArray (0, length arr - 1) arr
 
 -- Construct a (1, 1)-indexed 2D array
-listArr2D1 :: (a -> b) -> [[a]] -> Arr2D b
-listArr2D1 f arr = listArray ((1, 1), (x, y)) 
-                 $ concat $ map (map f) arr
+listArr2D1 :: [[a]] -> Arr2D a
+listArr2D1 arr = listArray ((1, 1), (x, y)) 
+                 $ concat arr
     where
     x = length arr
     y = length $ head arr
 
 -- Construct a (0, 0)-indexed 2D array
-listArr2D0 :: (a -> b) -> [[a]] -> Arr2D b
-listArr2D0 f arr = listArray ((0, 0), (x - 1, y - 1))
-                 $ concat $ map (map f) arr
+listArr2D0 :: [[a]] -> Arr2D a
+listArr2D0 arr = listArray ((0, 0), (x - 1, y - 1))
+                 $ concat arr
     where
     x = length arr
     y = length $ head arr
@@ -154,8 +156,8 @@ axMax :: Arr2D e -> Int
 axMax = fst . snd . bounds
 
 -- Dijkstra's
-type Graph = Arr2D Node
-type Node  = Char
+type Graph  = Arr2D Node
+type Node   = Char
 type DijkPQ = PQ.PQueue Int Coord
 
 data Dijkstra = Dijkstra

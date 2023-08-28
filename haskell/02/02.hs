@@ -31,4 +31,5 @@ aocParse = some oneRPS <* eof
     oneRPS = do 
         f <- lexeme upperChar
         m <- lexeme upperChar
-        pure $ (fromEnum f - fromEnum 'A', fromEnum m - fromEnum 'X')
+        pure $ (convert f 'A', convert m 'X')
+        where convert = (-) `on` fromEnum

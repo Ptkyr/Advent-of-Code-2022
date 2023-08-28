@@ -24,7 +24,7 @@ partTwo d = dijkstra (\x -> (_graph d)!x == 'a') p2Adj d {_start = _end d}
 aocParse :: Parser Dijkstra
 aocParse = do
     grid <- some letterChar `endBy` newline <* eof
-    let graph = listArr2D1 id grid
+    let graph = listArr2D1 grid
     let idxS  = indexByValue 'S' graph
     let idxE  = indexByValue 'E' graph
     pure $ Dijkstra idxS idxE (graph // [(idxS, 'a'), (idxE, 'z')])

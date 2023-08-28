@@ -51,4 +51,4 @@ viewDist :: (Int -> Int) -> (Int -> Int) -> Arr2D Int -> Arr2D Int
 viewDist = valueAt 0 1 (+) 
 
 aocParse :: Parser (Arr2D Int)
-aocParse = listArr2D1 digitToInt <$> some digitChar `endBy` newline <* eof
+aocParse = listArr2D1 <$> (some $ digitToInt <$> digitChar) `endBy` newline <* eof
