@@ -6,17 +6,13 @@ main = do
     case parsed of
         Left pError -> putStr $ errorBundlePretty pError
         Right input -> do
-            print $ fillLine (-9, 0) (0, -9)
-            print input
             print $ partOne input
             print $ partTwo input
 
 partOne :: Network -> Int
 partOne (Network net x x') = length 
                            $ filter (inCoverage True net)
-                           $ zip search $ repeat 2000000
-    where
-    search = [x..x']
+                           $ zip [x..x'] $ repeat 2000000
 
 partTwo :: Network -> Int
 partTwo (Network net _ _) = a * 4000000 + b
