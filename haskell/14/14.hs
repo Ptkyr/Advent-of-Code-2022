@@ -59,10 +59,10 @@ dropSand endCnd i curCave = case dropUnit curCave of
 aocParse :: Parser Cave
 aocParse = do
     allRocks <- concat <$> some parseRock <* eof
-    let xMin = sub1 $ fst $ minimumBy (compare `on` fst) allRocks
-    let xMax = add1 $ fst $ maximumBy (compare `on` fst) allRocks
-    let yMax = add1 $ snd $ maximumBy (compare `on` snd) allRocks
-    let grid = listArray ((xMin, 0), (xMax, yMax)) (repeat False)
+    let xMin = sub1 . fst $ minimumBy (compare `on` fst) allRocks
+    let xMax = add1 . fst $ maximumBy (compare `on` fst) allRocks
+    let yMax = add1 . snd $ maximumBy (compare `on` snd) allRocks
+    let grid = listArray ((xMin, 0), (xMax, yMax)) $ repeat False
     pure $ grid // zip allRocks (repeat True)
     where
     parseRock :: Parser Rock

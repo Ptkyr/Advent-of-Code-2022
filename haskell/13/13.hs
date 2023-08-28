@@ -19,7 +19,7 @@ instance (Ord a) => Ord (Packet a) where
     compare (Some []) (Some [])      = EQ
     compare (Some []) (Some (_ : _)) = LT
     compare (Some (_ : _)) (Some []) = GT
-    compare (Some (x : xs)) (Some (y : ys)) 
+    compare (Some (x : xs)) (Some (y : ys))
         | res == EQ                  = compare (Some xs) (Some ys)
         | otherwise                  = res
         where res = compare x y
