@@ -7,7 +7,7 @@ main = do
         Left pError -> putStr $ errorBundlePretty pError
         Right input -> do
             print $ partOne input
-            print $ partTwo input
+--            print $ partTwo input
 
 partOne :: Network -> Int
 partOne (Network net x x') = length 
@@ -33,8 +33,10 @@ type Coverage = Arr2D Bool
 
 
 inCoverage :: Bool -> [Sensor] -> Coord -> Bool
-inCoverage checkBeacon net coord = foldl' (||) False 
-                                 $ map (isCovered checkBeacon coord) net
+inCoverage checkBeacon net coord = foldl' thing False net
+    where 
+    thing :: Bool -> Sensor -> Bool
+    thing b sens = b || isCovered checkBeacon coord sens
 
 isCovered :: Bool -> Coord -> Sensor -> Bool
 isCovered checkBeacon c s = if checkBeacon 
@@ -43,8 +45,7 @@ isCovered checkBeacon c s = if checkBeacon
     where inrange = manhat c (_sensor s) <= _range s
 
 manhat :: Coord -> Coord -> Int
-manhat c1 c2 = x + y
-    where (x, y) = liftT2 (b1 abs (-)) c1 c2
+manhat = phoenix (+) fst snd ... liftT2 (abs ... (-))
 
 data Network = Network
     { _sensors :: [Sensor]

@@ -67,16 +67,20 @@ nthTri n = (n * (n + 1)) `div` 2
 
 -- Combinators
 phi :: (b -> y -> c) -> (a -> b) -> (x -> y) -> a -> x -> c
-phi bin un un' a1 a2 = bin (un a1) (un' a2)
+phi bin un1 un2 a1 a2 = bin (un1 a1) (un2 a2)
 
-b1 :: (c -> d) -> (a -> b -> c) -> a -> b -> d
-b1 un bin x y = un $ bin x y
+phoenix :: (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
+phoenix bin un1 un2 arg = bin (un1 arg) (un2 arg)
 
 liftT1 :: (a -> b) -> (a, a) -> (b, b)
 liftT1 f (x, y) = (f x, f y)
 
 liftT2 :: (a -> a -> b) -> (a, a) -> (a, a) -> (b, b)
 liftT2 f a b = (on f fst a b, on f snd a b)
+
+-- b1 combinator
+(...) :: (c -> d) -> (a -> b -> c) -> a -> b -> d
+(...) = (.) . (.)
 
 -- Parser util
 type Parser = Parsec Void Text
