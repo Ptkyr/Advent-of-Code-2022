@@ -45,15 +45,15 @@ aocParse = lexeme "$ cd /" *> parseDir (Dir 0 "/" [] Nothing)
     parseDir dir = choice
         [ lexeme "$ ls"    *> skip
         , lexeme "$ cd .." *> back
-        , lexeme "$ cd" *> lexword
-                           *> parseDir (Dir 0 "" [] $ Just dir)
-        , lexeme "dir" *> lexword 
-                           *> skip
+        , lexeme "$ cd" 
+          *> lexword       *> parseDir (Dir 0 "" [] $ Just dir)
+        , lexeme "dir" 
+          *> lexword       *> skip
         , do 
             i <- nat 
             void fName     *> parseDir dir {_size = _size dir + i}
         , eof *> case _name dir of
-            "/"            -> pure $ dir
+            "/"            -> pure dir
             _              -> back
         ]
         where 
