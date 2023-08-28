@@ -45,7 +45,7 @@ isCovered checkBeacon c s = if checkBeacon
     where inrange = manhat c (_sensor s) <= _range s
 
 manhat :: Coord -> Coord -> Int
-manhat = phoenix (+) fst snd ... liftT2 (abs ... (-))
+manhat = phoenix (+) fst snd .: liftT2 (abs .: (-))
 
 data Network = Network
     { _sensors :: [Sensor]

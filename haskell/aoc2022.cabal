@@ -23,6 +23,7 @@ library
                       , array
                       , fingertree
                       , utility-ht
+                      , composition
     hs-source-dirs:   common
     default-language: Haskell2010
     default-extensions: OverloadedStrings

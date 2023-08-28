@@ -10,6 +10,7 @@ module Utils
     , module Data.Ord
     , module Data.List.HT
     , module Data.Function
+    , module Data.Composition
     , readMaybe
     , void
     , Text
@@ -35,6 +36,7 @@ import qualified Data.PriorityQueue.FingerTree as PQ
 import Data.List.HT (mapAdjacent)
 import Data.Function
 import GHC.Arr (amap)
+import Data.Composition
 
 -- Typedefs
 type Coord = (Int, Int)
@@ -77,10 +79,6 @@ liftT1 f (x, y) = (f x, f y)
 
 liftT2 :: (a -> a -> b) -> (a, a) -> (a, a) -> (b, b)
 liftT2 f a b = (on f fst a b, on f snd a b)
-
--- b1 combinator
-(...) :: (c -> d) -> (a -> b -> c) -> a -> b -> d
-(...) = (.) . (.)
 
 -- Parser util
 type Parser = Parsec Void Text
@@ -138,16 +136,14 @@ listArr0 arr = listArray (0, length arr - 1) arr
 
 -- Construct a (1, 1)-indexed 2D array
 listArr2D1 :: [[a]] -> Arr2D a
-listArr2D1 arr = listArray ((1, 1), (x, y)) 
-                 $ concat arr
+listArr2D1 arr = listArray ((1, 1), (x, y)) $ concat arr
     where
     x = length arr
     y = length $ head arr
 
 -- Construct a (0, 0)-indexed 2D array
 listArr2D0 :: [[a]] -> Arr2D a
-listArr2D0 arr = listArray ((0, 0), (x - 1, y - 1))
-                 $ concat arr
+listArr2D0 arr = listArray ((0, 0), (x - 1, y - 1)) $ concat arr
     where
     x = length arr
     y = length $ head arr
