@@ -15,19 +15,19 @@ partOne :: [LinePair] -> Int
 partOne = sum . map contains
     where
     contains :: LinePair -> Int
-    contains (a1, a2, b1, b2)
-        | a1 <= b1 && b2 <= a2 = 1
-        | b1 <= a1 && a2 <= b2 = 1
-        | otherwise            = 0
+    contains (a, a', b, b')
+        | a <= b && b' <= a' = 1
+        | b <= a && a' <= b' = 1
+        | otherwise          = 0
 
 partTwo :: [LinePair] -> Int
 partTwo = sum . map overlaps
     where
     overlaps :: LinePair -> Int
-    overlaps (a1, a2, b1, b2)
-        | a2 <= b2 && a2 >= b1 = 1
-        | a2 >= b2 && a1 <= b2 = 1
-        | otherwise            = 0
+    overlaps (a, a', b, b')
+        | a' <= b' && a' >= b = 1
+        | a' >= b' && a <= b' = 1
+        | otherwise           = 0
 
 aocParse :: Parser [LinePair]
 aocParse = some parseLinePair <* eof
