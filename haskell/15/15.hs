@@ -9,11 +9,7 @@ main = do
             print $ partOne input
             print $ partTwo input
 
-data Network = Network
-    { _sensors :: [Sensor]
-    , _xmin    :: Int
-    , _xmax    :: Int
-    } deriving (Show)
+type Network = [Sensor]
 
 data Sensor = Sensor
     { _sensor :: Coord
@@ -22,18 +18,25 @@ data Sensor = Sensor
     } deriving (Show)
 
 partOne :: Network -> Int
-partOne (Network net x x') = length 
-                           $ filter (inCoverage net)
-                           $ zip [x..x'] $ repeat 2000000
+partOne network = length 
+                $ filter (inCoverage network)
+                $ zip [x..x'] $ repeat 2000000
+    where
+    sens = map (fst . _sensor) network
+    xmin = minimum sens
+    xmax = maximum sens
+    rmax = maximum $ map _range network
+    x    = xmin - rmax
+    x'   = xmax + rmax
 
 partTwo :: Network -> Int
-partTwo (Network net _ _) = a * 4000000 + b
+partTwo network = a * 4000000 + b
     where
     maxOut = 4000000
     (a, b) = head 
-           . dropWhile (inCoverage net) 
+           . dropWhile (inCoverage network) 
            . filter (inRange ((0, 0), (maxOut, maxOut)))
-           $ blindSpots net
+           $ blindSpots network
     blindSpots :: [Sensor] -> [Coord]
     blindSpots = concat . map boundary 
     boundary :: Sensor -> [Coord]
@@ -51,19 +54,11 @@ inCoverage :: [Sensor] -> Coord -> Bool
 inCoverage net coord = foldl' foldCover False net
     where 
     foldCover :: Bool -> Sensor -> Bool
-    foldCover bl (Sensor s b r) = bl || isCovered
-        where
-        isCovered = coord /= b && manhattan coord s <= r
+    foldCover res (Sensor s b r) = res || isCovered
+        where isCovered = coord /= b && manhattan coord s <= r
 
 aocParse :: Parser Network
-aocParse = do
-    network <- some parseSensor <* eof
-    let sensors = map (fst . _sensor) network
-    let beacons = map (fst . _beacon) network
-    let xmin = on min minimum sensors beacons
-    let xmax = on max maximum sensors beacons
-    let rmax = maximum $ map _range network
-    pure $ Network network (xmin - rmax) (xmax + rmax)
+aocParse = some parseSensor <* eof
     where
     parseSensor :: Parser Sensor
     parseSensor = do
