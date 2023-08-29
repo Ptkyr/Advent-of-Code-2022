@@ -51,6 +51,9 @@ sub1 = flip (+) (-1)
 clamp2D :: ((Int, Int), (Int, Int)) -> (Int, Int) -> (Int, Int)
 clamp2D ((x, y), (x', y')) (a, b) = (clamp (x, x') a, clamp (y, y') b)
 
+manhattan :: Coord -> Coord -> Int
+manhattan = phoenix (+) fst snd .: liftT2 (abs .: (-))
+
 -- Will drop the last element if odd
 toPairs :: [a] -> [(a, a)]
 toPairs (x : y : zs) = (x, y) : toPairs zs
@@ -62,7 +65,14 @@ fillLine :: Coord -> Coord -> [Coord]
 fillLine (x, y) (x', y')
     | x == x' = zip (repeat x) [min y y'..max y y']
     | y == y' = zip [min x x'..max x x'] $ repeat y
-    | otherwise = error "To-do"
+    | otherwise = zip xList yList
+    where
+    xList = if x < x'
+            then [x, x + 1..x']
+            else [x, x - 1..x']
+    yList = if y < y'
+            then [y, y + 1..y']
+            else [y, y - 1..y']
 
 nthTri :: Int -> Int
 nthTri n = (n * (n + 1)) `div` 2
