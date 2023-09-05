@@ -1,4 +1,5 @@
 import Utils
+import Data.Array
 
 main :: IO ()
 main = do

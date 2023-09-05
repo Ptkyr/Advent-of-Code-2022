@@ -1,4 +1,5 @@
 import Utils
+import Data.Array
 
 main :: IO ()
 main = do
@@ -18,22 +19,25 @@ data Move = Move
     }
 
 partOne :: Info -> String
-partOne = map head . elems . execute reverse
+partOne = extract reverse
 
 partTwo :: Info -> String
-partTwo = map head . elems . execute id
+partTwo = extract id
 
-execute :: (Crates -> Crates) -> Info -> Arr Crates
-execute _ (ac, [])        = ac
-execute func (ac, m : ms) = execute func (doMove func m ac, ms)
-
-doMove :: (Crates -> Crates) -> Move -> Arr Crates -> Arr Crates
-doMove func (Move num from to) ac = ac // [(from, newFrom), (to, newTo)]
+extract :: (Crates -> Crates) -> Info -> Crates
+extract func = map head . elems . execute
     where
-    fromCrates        = ac!from
-    toCrates          = ac!to
-    (moving, newFrom) = splitAt num fromCrates
-    newTo             = func moving ++ toCrates
+    execute :: Info -> Arr Crates
+    execute (ac, [])     = ac
+    execute (ac, m : ms) = execute (doMove m ac, ms)
+    doMove :: Move -> Arr Crates -> Arr Crates
+    doMove (Move num from to) ac 
+        = ac // [(from, newFrom), (to, newTo)]
+        where
+        fromCrates        = ac!from
+        toCrates          = ac!to
+        (moving, newFrom) = splitAt num fromCrates
+        newTo             = func moving ++ toCrates
     
 aocParse :: Parser Info
 aocParse = do
@@ -45,8 +49,8 @@ aocParse = do
     parseCrates = (oneCrate `sepBy1` char ' ') `endBy` newline
     oneCrate :: Parser Crates
     oneCrate = choice
-        [ char '[' *> some upperChar <* char ']'
-        , string "   " *> (pure []) -- for the ++ later
+        [ char '[' *> word <* char ']'
+        , string "   " *> (pure []) -- for the ++ zip later
         ]
     parseMove :: Parser Move
     parseMove = Move <$> (lexeme "move" *> nat)

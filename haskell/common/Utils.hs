@@ -1,14 +1,12 @@
 module Utils 
     ( module Utils
     , module Data.Void
-    , module Data.Array
     , module Data.Char
     , module Data.List
     , module Text.Megaparsec 
     , module Text.Megaparsec.Char
     , module Text.Megaparsec.Debug
     , module Data.Ord
-    , module Data.List.HT
     , module Data.Function
     , module Data.Composition
     , readMaybe
@@ -16,6 +14,7 @@ module Utils
     , Text
     , pack
     , amap
+    , mapAdjacent
     ) where
 
 import Text.Megaparsec hiding (parse)
@@ -31,12 +30,11 @@ import Data.List
 import Data.Array
 import Control.Applicative hiding (some)
 import Data.Ord
-import Data.Either
 import qualified Data.PriorityQueue.FingerTree as PQ
 import Data.List.HT (mapAdjacent)
 import Data.Function
 import GHC.Arr (amap)
-import Data.Composition
+import Data.Composition -- mostly for .:
 
 -- Typedefs
 type Coord = (Int, Int)
@@ -83,6 +81,9 @@ phi bin un1 un2 a1 a2 = bin (un1 a1) (un2 a2)
 
 phoenix :: (b -> c -> d) -> (a -> b) -> (a -> c) -> a -> d
 phoenix bin un1 un2 arg = bin (un1 arg) (un2 arg)
+
+yharon :: (b -> c -> d -> e) -> (a -> b) -> (a -> c) -> a -> d -> e
+yharon t u1 u2 a = t (u1 a) (u2 a)
 
 liftT1 :: (a -> b) -> (a, a) -> (b, b)
 liftT1 f (x, y) = (f x, f y)
