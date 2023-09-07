@@ -8,10 +8,13 @@ main = do
     case parsed of
         Left pError -> putStr $ errorBundlePretty pError
         Right input -> do
-            print $ tetris input
+            print $ partOne input
             --putStr . showCave $ tetris input
 
 type Cave = Arr2D Bool
+
+partOne :: (Int -> Tetris) -> Int
+partOne tet = tetris $ tet 2022
 
 showCave :: Cave -> String
 showCave cave = showHelp 1 $ elems cave
@@ -44,9 +47,10 @@ data Tetris = Tetris
     { _jets   :: [Jet]
     , _rocks  :: [Rock]
     , _cave   :: Cave
-    , _total  :: Int
     , _height :: Int
+    , _clears :: Int
     , _place  :: Bool
+    , _total  :: Int
     }
 
 -- Call this with tetris (result of aocParse)
@@ -54,14 +58,14 @@ data Tetris = Tetris
 --   matrix, 2022 for the count, 0 as initial height
 tetris :: Tetris -> Int
 tetris t@(Tetris (jet : js) (cur@(Rock shape rh ri) : rs) 
-          cave total height place)
+          cave height clears place total)
     | total == 0 = height
     | place      = tetris t {_cave  = placeRock cur cave, 
                              _place = False}
     | canDrop    = tetris (Tetris js (downCur : rs) 
-                           cave total height place)
-    | otherwise  = tetris (Tetris js rs cave' (total - 1)
-                           height' True)
+                           cave height clears place total)
+    | otherwise  = tetris (Tetris js rs cave'
+                           height' clears True (total - 1))
     where
     transed = map jet shape
     jetted  = if validSpot transed cave
@@ -72,13 +76,23 @@ tetris t@(Tetris (jet : js) (cur@(Rock shape rh ri) : rs)
     canDrop = validSpot downed cave
     downCur = Rock downed rh $ ri + 1
     newCave = cave // (zip jetted $ repeat True)
+    restRow = filledRow newCave [rh..rh + ri] -- implicit +1
+    tncCave = listArray (origin, (restRow, 6)) $ elems newCave
     height' = calcHeight height newCave
     cave'   = listArray (origin, (height' - 1, 6)) 
             $ drop (7 * emptyRows newCave)
             $ elems newCave
-    restRows = [rh..rh + ri] -- no +1, implicit
 tetris _         = error "Shut up GHC you're unexhaustive"
-    
+
+filledRow :: Cave -> [Int] -> Int
+filledRow cave cands
+    | cands == []       = x -- return x to add 0 to cleared height
+    | fullRow cave cand = cand
+    | otherwise         = filledRow cave $ tail cands
+    where
+    bnds@(_, (x, _)) = bounds cave
+    cand = head cands
+
 calcHeight :: Int -> Cave -> Int
 calcHeight cur cave = x - highEmpty
     where
@@ -133,13 +147,13 @@ type Jet = Coord -> Coord
 
 emptyarr :: Cave
 emptyarr = listArray ((1, 1), origin) []
-aocParse :: Parser Tetris
+aocParse :: Parser (Int -> Tetris)
 aocParse = do
     jets <- some parseJet <* newline <* eof
     pure $ Tetris (cycle jets)
                   rockOrder
                   emptyarr
-                  2022
+                  0
                   0
                   True
     where
