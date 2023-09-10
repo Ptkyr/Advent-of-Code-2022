@@ -14,7 +14,7 @@ main = do
 type Cave = Arr2D Bool
 
 partOne :: Tetris -> Int
-partOne = tetris 2022
+partOne = tetris 1
 
 showCave :: Cave -> String
 showCave cave = showHelp 1 $ elems cave
@@ -29,7 +29,7 @@ showCave cave = showHelp 1 $ elems cave
 data Rock = Rock
     { _shape  :: [Coord] -- track positions
     , _rockht :: Int -- just for how much to pad when placing
-    , _rowidx :: Int
+    , _drops  :: Int
     }
 
 placeRock :: Rock -> Cave -> Cave
@@ -47,9 +47,8 @@ data Tetris = Tetris
     { _jets   :: [Jet]
     , _rocks  :: [Rock]
     , _cave   :: Cave
-    , _height :: Int
     , _clears :: Int
-    , _place  :: Bool
+    , _place  :: Int
     }
 
 -- Call this with tetris (result of aocParse)
@@ -58,39 +57,45 @@ data Tetris = Tetris
 tetris :: Int -> Tetris -> Int
 tetris rocksLeft t@(Tetris 
                     (jet : js) 
-                    (cur@(Rock shape rh ri) : rs) 
-                    cave height clears place)
+                    (cur@(Rock shape rh drops) : rs) 
+                    cave clears place)
     | rocksLeft == 0 
-    = trace (show clears) axMax cave + clears + 1
-    | place      
-    = tetris rocksLeft t {_cave  = placeRock cur cave, 
-                          _place = False}
-    | canDrop    
-    = tetris rocksLeft (Tetris js (downCur : rs) 
-                        cave height clears place)
-    | otherwise  
-    = tetris (rocksLeft - 1) (Tetris js rs cave'
-                              height' clears' True)
+    = trace ("ending\n" ++ show clears) axMax cave + clears + 1
+    | place < 3 || canDrop -- lower the tile
+    = trace ("dropping\n" ++ show shape) tetris rocksLeft (Tetris js (downCur : rs) 
+                        cave clears place')
+    | otherwise
+    = trace ("resting\n" ++ showCave tncCave) tetris rL' (Tetris js rs tncCave
+                  clears' 0)
     where
+    rL'     = rocksLeft - 1
+    place'  = place + 1
     transed = map jet shape
     jetted  = if validSpot transed cave
               then transed
               else shape
     downed  = map (\(a, b) -> (a + 1, b)) jetted
     canDrop = validSpot downed cave
-    downCur = Rock downed rh $ ri + 1
+    downCur = Rock downed rh $ drops + 1
+    
+    deltaH  = rh + 3 - drops
+    hChange = deltaH /= 0
+    padding = replicate (7 * deltaH) False
+    
+    padCave = trace (show deltaH) listArray (origin, (axMax cave + deltaH, 6)) 
+            $ padding ++ elems cave
 
-    newCave = cave // (zip jetted $ repeat True)
+    newCave = padCave // (zip jetted $ repeat True)
   
-    restRow = filledRow newCave [ri..ri + rh] -- implicit +1
-    clears' = clears + axMax newCave - restRow
-    tncCave = listArray (origin, (restRow, 6)) $ elems newCave
+    restTop = if drops - (rh + 3) > 0
+              then drops - (rh + 3)
+              else 0
+    trunRow = filledRow newCave [restTop..restTop + rh - 1]
+    clears' = clears + axMax newCave - trunRow -- no change if no clear
+    cleared = clears' /= clears
+    tncCave = listArray (origin, (trunRow, 6))
+            $ elems newCave
 
-    height' = calcHeight height tncCave
-    empRows = emptyRows tncCave
-    cave'   = listArray (origin, (axMax tncCave - empRows, 6)) 
-            $ drop (7 * empRows)
-            $ elems tncCave
 tetris _ _       = error "Shut up GHC you're unexhaustive"
 
 filledRow :: Cave -> [Int] -> Int
@@ -165,7 +170,6 @@ aocParse = do
                   emptyarr
                   0
                   0
-                  True
     where
     parseJet :: Parser Jet
     parseJet = choice
